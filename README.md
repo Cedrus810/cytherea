@@ -1,5 +1,7 @@
 # Cytherea
 
+[English](README.md) | 简体中文
+
 **Aimed-shooting and weighted-ensemble kinetics for proteins in solution, built on OpenMM.**
 
 Cytherea rebuilds the chemical-dynamics idea of [VENUS96](https://doi.org/10.1016/0010-4655(96)00042-4)
