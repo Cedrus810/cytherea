@@ -14,6 +14,7 @@ Cytherea 用 Python + OpenMM 重建 VENUS96 的功能结构，目标是溶液中
 - 环境：`export MAMBA_EXE=/home/ruigengji/miniforge3/bin/mamba; export MAMBA_ROOT_PREFIX=/home/ruigengji/miniforge3; source /home/ruigengji/miniforge3/etc/profile.d/mamba.sh; mamba activate openmm_dev`
 - 包以 editable 方式从本 checkout 安装，所以直接 `pytest -q` 就是快速套件。slow 测试要显式用 `-m slow` 跑。在 git worktree 里跑测试必须加 `PYTHONPATH=src`。
 - **git 仓库就在树内**（`/home/ruigengji/cytherea/.git`；yayoi 的 /home 是本地 xfs 盘，可直接写）。2026-10-02 项目由 venus-ng 更名 Cytherea 后重新播种，此前的历史（T1–T13、修复包 P1–P8/L1–L7 的提交）只存在于 kasuga180 本地盘的 `/home/kasuga/gitdirs/venus-ng.git`，yayoi 够不着；在 kasuga 的 NFS home 上写 git 对象会报权限错误，那是旧仓库用独立 gitdir 的原因。**现有提交是快照按模块/任务的展示性分组，不代表各提交点可独立构建，别拿来做 bisect。**
+- 远程:`github.com/Cedrus810/cytherea`(公开,MIT,2026-10-02 建库;main 与 phase-a 均已推送)。
 - 工作分支是 `phase-a`（种子提交后的工作分支）；`main` 与它同点起步。旧仓库的 `t9`、`t15` WIP 分支没有搬过来（在 180 的 gitdir 里），要用得先取回，而且写的时候用的是修复前的接口，拿来用之前要先改。
 - commit 信息**不加任何 AI 署名**（用户 2026-10-02 明确要求：贡献者里没有 Claude）。
 - 不新增依赖。scipy、deeptime、pydantic（≥2）、pyyaml 已经声明（后两个 2026-10-02 为 T13 加入）。
