@@ -1,0 +1,32 @@
+# Shots of tau = 100 ps (the 14b lag) from prepared frames, phi/psi every 1 ps,
+# LangevinMiddle gamma = 0.1 /ps (the reference propagator).
+mode: shoot.ensemble
+units: openmm
+system:
+  kind: openmm
+  system_xml: ../../runs/ala2_system/system.xml
+  topology_pdb: ../../runs/ala2_system/topology.pdb
+physics:
+  kind: openmm
+  integrator: langevin_middle
+  dt: 2 fs
+  temperature: 300 K
+  friction: 0.1 /ps
+  constraints: hbonds
+  rigid_water: true
+  platform: CUDA
+  precision: mixed
+  purpose: measurement
+ic:
+  kind: frames
+  path: ../../runs/ala2_prepare/frames.npz
+  min_pair_dist: 0.5 angstrom
+stop: {kind: fixed_lag, tau: 100 ps}
+observables:
+  dt_obs: 1 ps
+  items:
+    - {name: phi, kind: dihedral, atoms: [4, 6, 8, 14]}
+    - {name: psi, kind: dihedral, atoms: [6, 8, 14, 16]}
+budget: {shots_per_frame: 10, stage: shoot}
+seed: 20261002
+store_path: ../../runs/ala2_shoot/shots.sqlite

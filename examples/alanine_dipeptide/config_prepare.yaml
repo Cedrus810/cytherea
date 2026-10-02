@@ -1,0 +1,29 @@
+# Equilibrated frames of the A1 system (amber14 + TIP3P-FB, 300 K).
+# Frames for 14b come from the reference trajectory instead; this is the
+# generic prepare path. CUDA: run alone on the GPU (CLAUDE.md).
+mode: prepare
+units: openmm
+system:
+  kind: openmm
+  system_xml: ../../runs/ala2_system/system.xml
+  topology_pdb: ../../runs/ala2_system/topology.pdb
+physics:
+  kind: openmm
+  integrator: langevin_middle
+  dt: 2 fs
+  temperature: 300 K
+  friction: 1 /ps
+  constraints: hbonds
+  rigid_water: true
+  platform: CUDA
+  precision: mixed
+  purpose: equilibration
+ic: {kind: structure}
+budget:
+  minimize: true
+  equilibrate: 100 ps
+  n_frames: 100
+  frame_interval: 10 ps
+  output_frames: ../../runs/ala2_prepare/frames.npz
+  stage: prepare
+seed: 20261002

@@ -1,0 +1,24 @@
+# 1D double-well committor from fixed points (as A0 9.2, smaller budget).
+# cytherea run examples/toy_doublewell/config.yaml
+mode: shoot.ensemble
+units: reduced
+system:
+  kind: analytic
+  potential: {name: DoubleWell1D, params: {barrier: 5.0}}
+physics: {kind: analytic, integrator: overdamped, dt: 5.0e-4, kT: 1.0, gamma: 1.0, mass: 1.0}
+ic:
+  kind: points
+  points: [[-0.4], [-0.2], [0.0], [0.2], [0.4]]
+stop:
+  kind: absorbing_AB
+  A: {name: A, all_of: [{observable: x, le: -0.8}]}
+  B: {name: B, all_of: [{observable: x, ge: 0.8}]}
+  tau_persist: 5.0e-3
+  t_max: 50.0
+observables:
+  dt_obs: 5.0e-4
+  store_stride: 10
+  items: [{name: x, kind: coord, index: 0}]
+budget: {shots_per_frame: 200, n_workers: 4, stage: committor}
+seed: 20261002
+store_path: ../../runs/toy_doublewell/committor.sqlite

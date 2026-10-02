@@ -1,0 +1,28 @@
+# Same toy, committor from the barrier top with a weighted ensemble.
+mode: shoot.surface
+units: reduced
+system:
+  kind: analytic
+  potential: {name: DoubleWell1D, params: {barrier: 5.0}}
+physics: {kind: analytic, integrator: overdamped, dt: 5.0e-4, kT: 1.0, gamma: 1.0}
+ic: {kind: points, points: [[0.0]]}
+stop:
+  kind: absorbing_AB
+  A: {name: A, all_of: [{observable: x, le: -0.8}]}
+  B: {name: B, all_of: [{observable: x, ge: 0.8}]}
+  tau_persist: 0.0
+  t_max: 0.1
+observables:
+  dt_obs: 5.0e-4
+  items: [{name: x, kind: coord, index: 0}]
+resampler:
+  kind: we
+  progress: x
+  bin_edges: [-0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6]
+  target_per_bin: 4
+  tau_seg: 0.05
+  n_iter: 100
+  walkers_per_frame: 8
+budget: {stage: we}
+seed: 20261002
+store_path: ../../runs/toy_doublewell/we.sqlite
