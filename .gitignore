@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+*.sqlite
+runs/
+examples/**/out/
+.superpowers/
+.ruff_cache/
+/*.o[0-9]*

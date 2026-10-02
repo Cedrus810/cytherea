@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cytherea"
+version = "0.1.0"
+description = "Cytherea: a Python + OpenMM rewrite of the VENUS chemical-dynamics idea for proteins"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "deeptime",
+    "pydantic>=2",
+    "pyyaml>=6",
+]
+
+[project.scripts]
+cytherea = "cytherea.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselected by default)",
+]
+addopts = "-m 'not slow'"
