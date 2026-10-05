@@ -550,32 +550,39 @@ def dispatch(cfg: RunConfig) -> Callable[[], None]
 
 ### Task 14: A1 丙氨酸二肽（显式水）
 
-**Files:** Create `examples/alanine_dipeptide/`（prepare、ref_long、shoot_ensemble、shoot_surface 四个配置）、`docs/reports/A1.md`
+**Files:** `examples/alanine_dipeptide/`（14a 参考脚本已完成；14b 新增 `shoot_a1.py`：`frames` / `configs` / `analyze` / `pes` 子命令）、`cytherea.estimate.msm.ck_test_shots`、`docs/reports/A1.md`
 
-**协议（锁定）：**
-- 力场：amber14-all + TIP3P-FB；300 K；约束 HBonds，刚性水；dt = 2 fs。
-- 测量阶段用 NVE 或 Langevin γ = 0.1 ps⁻¹。
-- **参考**：一条 ≥ 1 μs 的长轨迹。状态按 φ/ψ 分为 C7eq/C5、αR、αL，建 MSM（deeptime），得到 implied timescales。
-- **射击**（2026-10-01 修订，依据全量审查 F 和 P8）：
-  - 起始帧只从**位于 core 内部**的参考帧里抽取，每个状态抽 50 帧；ShotKey 显式指定 `frame_id`（K3），每帧打 20 个 shot。
-  - 用 `FixedLag(τ)`。τ 取 `analyze_ref.py` 报告的 `shoot_lag_ps`，即 core-start 模式下最慢 ITS 已经收敛、**并且 core-start CK 通过**的 lag，不小于 10 ps；τ 必须在 ≥1 µs 的完整参考数据上确定，不能用 19.5 ns 的试算值。（2026-10-02 补充：αL 被访问到以后，t2 是 αL 过程，只看 t2 会选到 10 ps，而这时 C7eq↔αR 的 t3 还在桥区偏差里，CK 不通过。按 947 ns 完整参考数据，τ = 100 ps。）
-  - 终态标注使用 `ala2_common` 里的同一套状态定义：带 `initial_label` 的 transition-based assignment，标注间隔 1 ps。估计量用与参考相同的 reversible estimator，γ = 0.1 ps⁻¹。
-  - 起始帧是溶剂化体系，所以 IC 门禁必须已经具备按最小镜像计算的 `min_pair_dist`（P2）。
-- **surface**：在 αR ↔ C7eq 的分界面（ψ ≈ 等 committor 面附近）取 30 帧，每帧 100 shot，用 `AbsorbingAB`。
+**协议（锁定；2026-10-03 按用户决定修订，解决 review_handoff DOC-01）：**
+- 力场：amber14-all + TIP3P-FB；300 K；约束 HBonds，刚性水；dt = 2 fs；测量阶段 Langevin(Middle) γ = 0.1 ps⁻¹（与参考相同）。
+- **参考**（14a，已完成）：`runs/ala2_ref`（237 ns，2 段）+ `runs/ala2_par/r01–r08`（各 100 ns），原始 1037 ns，每条去掉 10 ns 预平衡后 947 ns、10 条独立轨迹。**用户 2026-10-03 确认按此验收**（多条独立轨迹可以代替“一条 ≥1 μs”）。状态 C7eq/C5、αR、αL（`ala2_common` 的 core 定义），14b 的 τ = `shoot_lag_ps` = 100 ps。
+- **起始帧**：只取参考 DCD（每 10 ps 一帧）中 raw core label ≥ 0 的帧（跳过每条 10 ns 预平衡），每个状态 50 帧；在每个状态的候选帧（按轨迹、时间排序）上做带随机起点的等距抽样，使帧分散到各轨迹和时间段。每帧记录：来源轨迹、DCD 帧号、时间、φ/ψ、raw core label、所属 core 驻留段（visit）编号、box。坐标处理：按分子整体平移回盒内（float64），IC 门禁重新投影约束、用最小镜像的 `min_pair_dist`；速度由 IC 采样器按 Maxwell–Boltzmann 重抽。
+- **射击（长 shot，用户 2026-10-03 选定 14.3 的方案 A）**：每帧 **10 发**，`FixedLag(5500 ps)`（= 55 τ ≈ 2·t2），φ/ψ 每 1 ps 记录。每发的前 100 ps 就是 τ shot（供 14.2），整条给出 k = 1…55 的 T(kτ)（供 14.3）。总积分量 150 × 10 × 5.5 ns = 8.25 μs；开跑前在 GPU 空闲时实测吞吐（单进程 / MPS 并行），把预算报用户。分片：同一个帧文件，按 `budget.frames` 分成若干配置、各写自己的 store，用 MPS + 绑核并行。
+- **标注**：`ala2_common.label_shot`（带初始标签的 TBA，1 ps）；t = kτ 处的标签即终态。
+- **估计量**：比较**行归一化**的 core-start T（`estimate_T(..., reversible=False)`，按帧 cluster）；ITS 用 reversible 估计，只用于时间尺度。另报以 core 驻留段为 cluster 的区间（αL 只有约 12 段，帧数 ≠ 独立样本数）。
+- **surface**（14.4）：在 αR ↔ C7eq 分界面附近取 30 帧，每帧 100 shot，`AbsorbingAB`；单独一批，预算另报。
+
+**接口：**
+- `ck_test_shots(start_states, end_states_by_k, ks, n_states, n_boot, rng, frame_ids=None) -> CKResult`：shot 版 CK。`end_states_by_k[:, m]` 是每发在 t = ks[m]·τ 的状态，`ks` 必须含 1。T(kτ) 和 T(τ) 都只用 t = 0 出发的窗口（core-start），行归一化。统计量与 `ck_test` 相同：D = max_{k,ij} |T(τ)^k − T(kτ)|；零分布用按起始状态分层的 bootstrap（有 `frame_ids` 时以帧为单位），两项在同一重抽样上重估、以观测偏差为中心；D ≤ 95 分位为通过。
+- `shoot_a1.py frames`：输出 `frames.npz`（cytherea 帧格式）和 `frames.json`（上面列的每帧元数据）。
+- `shoot_a1.py analyze`：读全部分片 store，输出 `analysis_14b.json`：T(τ)（元素、Jeffreys 区间、n_eff）、与参考 contract T 的逐元素对照、ITS（t2、t3 及 bootstrap CI）、CK 结果、IC 拒绝率与原因、失败记录、帧与驻留段的相关性统计。
+
+**测试：**
+- `ck_test_shots`：3 态 Markov 链合成 shot 通过；带隐藏记忆的 lumped 链在长 horizon 上不通过；`ks` 不含 1、形状不符、某起始状态无 shot 时报错；结果只依赖 shot 集合，与顺序无关。
+- DCD 读帧：与 OpenMM 写出的小 DCD 往返一致（坐标、box）；分子整体回盒后分子内距离不变。
+- 帧选择：只选 core 内部帧、跳过预平衡、每状态数目正确、可复现（同 seed 同结果）。
+- analyze：合成记录（已知 T 的 Markov 链生成 φ/ψ 序列）恢复 T 并通过 CK。
 
 **验收：**
 
 | # | 内容 | 阈值 |
 |---|---|---|
-| 14.1 | `pes_consistency_suite`（溶剂化体系，CUDA mixed） | 通过（rtol 1e-3，因为是 mixed 精度） |
-| 14.2 | 射击得到的最慢 implied timescale | 落在参考 MSM 的 95% CI 内 |
-| 14.3 | 射击数据的 CK 检验 | 通过 |
-| 14.4 | 分界面 committor 分布 | 峰值在 0.5 附近，并如实报告直方图（不要求达到某个阈值，作为诊断） |
+| 14.1 | `pes_consistency_suite`（溶剂化体系，CUDA mixed，sampled 模式，`fd_atom_groups` = 溶质；后端声明截断，FD 跨截断的坐标跳过并报告数目） | 通过（mixed 精度的容差行，含 `repeat_rtol` 1e-3） |
+| 14.2 | 射击 T(τ) 的最慢 ITS t2 | 落在参考 core-start t2 的 95% CI 内（[1.51, 3.96] ns）；同时报告 t3 与逐元素 T 对照。t2 只有约 12 个参考事件支撑，是宽松检验 |
+| 14.3 | 射击数据自身的 CK（`ck_test_shots`，k = 1…55；T(τ) 用全部 shot 的第一个 τ，T(kτ) 用长 shot，2026-10-04） | 通过 |
+| 14.4 | 分界面 committor 分布 | 峰值在 0.5 附近，并如实报告直方图（诊断） |
 | 14.5 | 所有记录的 `ic_validity` | 拒绝率 < 1%，全部原因已汇总 |
 
-- [ ] 前台跑参考轨迹（2080 Ti，先看 `nvidia-smi`）→ 跑射击 → 写报告 → commit `test: A1 alanine dipeptide acceptance`
-
----
+- [ ] `ck_test_shots` + 帧工具（测试先行）→ 实测吞吐、报预算 → 跑长 shot → 14.1 → analyze → 14.4 → 写 `docs/reports/A1.md`
 
 ### Task 15: A2 chignolin
 
