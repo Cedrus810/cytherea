@@ -1567,3 +1567,26 @@ def test_from_openmm_system_matches_the_systems_constraints():
     system.addParticle(0.0)  # a virtual site
     with pytest.raises(ValueError, match="mass"):
         S.DistanceConstraints.from_openmm_system(system)
+
+
+def test_load_frames_reads_files_written_before_the_rename(tmp_path):
+    """Frame files written as venus-ng (format tag ``venus-ng-frames/1``, e.g.
+    runs/a3/frames) still load; save_frames writes the current tag; any other
+    tag is refused."""
+    from cytherea.ic.frames import load_frames, save_frames
+
+    frames = [EnsembleFrame(coordinates=np.full((2, 3), float(k)), box=None, topology_ref="t",
+                            temperature=300.0, weight=1.0, source_id="s", frame_id=k, time=float(k))
+              for k in range(2)]
+    save_frames(tmp_path / "new.npz", frames)
+    with np.load(tmp_path / "new.npz") as z:
+        assert str(z["format"]) == "cytherea-frames/1"
+        arrays = {k: z[k] for k in z.files}
+    for tag, ok in (("venus-ng-frames/1", True), ("other-frames/1", False)):
+        np.savez(tmp_path / "f.npz", **dict(arrays, format=np.array(tag)))
+        if ok:
+            got = load_frames(tmp_path / "f.npz")
+            assert [f.frame_id for f in got] == [0, 1] and np.array_equal(got[1].coordinates, frames[1].coordinates)
+        else:
+            with pytest.raises(ValueError, match="cytherea-frames/1"):
+                load_frames(tmp_path / "f.npz")

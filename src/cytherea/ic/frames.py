@@ -260,6 +260,8 @@ class EnsembleFramePool:
 # ---------------------------------------------------------------------------
 
 _FRAMES_FORMAT = "cytherea-frames/1"
+# the same layout, written before the project was renamed from venus-ng
+_LEGACY_FRAMES_FORMATS = frozenset({"venus-ng-frames/1"})
 
 
 def save_frames(path, frames: Sequence[EnsembleFrame]) -> None:
@@ -292,9 +294,9 @@ def save_frames(path, frames: Sequence[EnsembleFrame]) -> None:
 
 
 def load_frames(path) -> list[EnsembleFrame]:
-    """Read a `save_frames` file."""
+    """Read a `save_frames` file (also one written as venus-ng)."""
     with np.load(path, allow_pickle=False) as z:
-        if "format" not in z.files or str(z["format"]) != _FRAMES_FORMAT:
+        if "format" not in z.files or str(z["format"]) not in {_FRAMES_FORMAT, *_LEGACY_FRAMES_FORMATS}:
             raise ValueError(f"{path}: not a {_FRAMES_FORMAT} file")
         box = z["box"] if "box" in z.files else None
         ref = str(z["topology_ref"])
