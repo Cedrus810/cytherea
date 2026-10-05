@@ -166,7 +166,8 @@ def cmd_shoot(a) -> None:
     t0 = time.perf_counter()
     done = sum(1 for k in keys if store.has(key_digest(k)))
     for i in range(0, len(keys), a.chunk):  # chunks: progress lines and bounded memory
-        res = run_batch(keys[i:i + a.chunk], shot, store, n_workers=1, return_records=False)
+        res = run_batch(keys[i:i + a.chunk], shot, store, n_workers=1, return_records=False,
+                        allow_code_change=a.allow_code_change)
         reasons = {}
         for r in res:
             s = getattr(r, "stop_reason", "ic_rejected")
@@ -183,24 +184,46 @@ def _cell(reason: str) -> int:
     return _CELLS.index(reason) if reason in _CELLS[:2] else 2
 
 
-def diff_interval(o1, o2, q1: float, q2: float, seed: int = 1, n_draw: int = 20000) -> tuple[float, float]:
-    """95 % interval of beta_inf(q2) - beta_inf(q1) from the Jeffreys posterior of
-    the paired outcomes: each shot is one cell of (outcome at q1) x (outcome at
-    q2), cells reaction / escape / other (timeout, non-finite), the cell
-    probabilities ~ Dirichlet(counts + 1/2). The pairing is kept (a shot can
-    escape at q1 and still react at q2), and unlike a bootstrap the interval
-    never collapses to a point on few shots."""
-    from cytherea.estimate.association import nam_beta_inf
+def nam_beta_inf_array(beta, b: float, q: float):
+    """`cytherea.estimate.association.nam_beta_inf`, vectorised over beta."""
+    beta = np.asarray(beta, dtype=np.float64)
+    return beta / (1.0 - (1.0 - beta) * (b / q))
 
-    counts = np.zeros((3, 3))
-    for a, b in zip(o1, o2):
-        counts[_cell(a), _cell(b)] += 1
+
+def paired_posterior(o1, o2, rng: np.random.Generator, n_draw: int, prior: float = 0.5):
+    """Posterior draws of (beta(q1), beta(q2)) from the paired outcomes of shots
+    replayed at q1 < q2. One trajectory, one reaction rule: a shot first stops
+    at q1 (reaction / escape / other = timeout or non-finite); only a q1 escape
+    continues and can still react, escape or stop otherwise before q2, so a q1
+    reaction is a q2 reaction and a q1 "other" is a q2 "other". Any other pair
+    is impossible and raises ``ValueError``. The q1 outcome ~ Dirichlet(n +
+    prior) and the continuation of the q1 escapes ~ Dirichlet(m + prior), so with
+    the Jeffreys prior 1/2 beta(q1) ~ Beta(n_R + 1/2, n_E + 1/2), the one-sided
+    `estimate_kon` posterior; beta(q2) = (r1 + e1 rho) / (r1 + e1 (rho + eps))."""
+    n1, m = np.zeros(3), np.zeros(3)
+    for k, (a, b) in enumerate(zip(o1, o2, strict=True)):
+        c1, c2 = _cell(a), _cell(b)
+        if c1 == 1:
+            m[c2] += 1
+        elif c1 != c2:
+            raise ValueError(f"shot {k}: {a!r} at q1 with {b!r} at q2 is impossible (one trajectory, "
+                             "one reaction rule, q1 < q2)")
+        n1[c1] += 1
+    p1 = rng.dirichlet(n1 + prior, size=n_draw)
+    cont = rng.dirichlet(m + prior, size=n_draw)
+    r1, e1 = p1[:, 0], p1[:, 1]
+    r2, e2 = r1 + e1 * cont[:, 0], e1 * cont[:, 1]
+    return r1 / (r1 + e1), r2 / (r2 + e2)
+
+
+def diff_interval(o1, o2, q1: float, q2: float, seed: int = 1, n_draw: int = 20000,
+                  prior: float = 0.5) -> tuple[float, float]:
+    """Equal-tailed 95 % Bayesian credible interval of beta_inf(q2) - beta_inf(q1)
+    from `paired_posterior` (Jeffreys priors by default). Never collapses to a
+    point on few shots; not a frequentist confidence interval."""
     rng = np.random.Generator(np.random.PCG64(seed))
-    p = rng.dirichlet(counts.ravel() + 0.5, size=n_draw).reshape(n_draw, 3, 3)
-    r1, e1 = p[:, 0, :].sum(1), p[:, 1, :].sum(1)
-    r2, e2 = p[:, :, 0].sum(1), p[:, :, 1].sum(1)
-    b1, b2 = r1 / (r1 + e1), r2 / (r2 + e2)
-    d = np.array([nam_beta_inf(y, B_NM, q2) - nam_beta_inf(x, B_NM, q1) for x, y in zip(b1, b2)])
+    b1, b2 = paired_posterior(o1, o2, rng, n_draw, prior)
+    d = nam_beta_inf_array(b2, B_NM, q2) - nam_beta_inf_array(b1, B_NM, q1)
     lo, hi = np.percentile(d, [2.5, 97.5])
     return float(lo), float(hi)
 
@@ -210,7 +233,7 @@ def analyze_records(recs, seed: int = 1, n_draw: int = 20000) -> dict:
     replay), each through `estimate_kon` (weighted Jeffreys interval; timeouts
     and non-finite stops counted, ``valid`` False on any non-finite stop or
     > 5 % timeouts, K4), and the interval of beta_inf(q2) - beta_inf(q1) from
-    `diff_interval`. ``valid`` is False when either estimate is invalid;
+    `diff_interval` (also with uniform priors). ``valid`` is False when either estimate is invalid;
     ``diff_ci_note`` warns when the interval is dominated by the prior (fewer
     than MIN_OUTCOME reactions or escapes at one q). Shot weights are 1
     (b-sphere shots drawn by weight)."""
@@ -236,15 +259,18 @@ def analyze_records(recs, seed: int = 1, n_draw: int = 20000) -> dict:
                 "beta_inf_ci": list(e.beta_inf_ci), "n_reaction": e.n_reaction, "n_escape": e.n_escape,
                 "n_timeout": e.n_timeout, "n_nonfinite": e.n_nonfinite, "valid": e.valid}
 
+    o1, o2 = [r.stop_reason for r in at_q1], [r.stop_reason for r in recs]
     prior_dominated = any(min(e.n_reaction, e.n_escape) < MIN_OUTCOME for e in est.values())
     return {
         "n_shots": len(recs), "b_nm": B_NM, "q1_nm": q1, "q2_nm": q2,
         "q2": summary(est["q2"]), "q1": summary(est["q1"]),
         "valid": bool(est["q1"].valid and est["q2"].valid),
         "beta_inf_q2_minus_q1": est["q2"].beta_inf - est["q1"].beta_inf,
-        "diff_ci95": list(diff_interval([r.stop_reason for r in at_q1], [r.stop_reason for r in recs],
-                                        q1, q2, seed=seed, n_draw=n_draw)),
-        "diff_ci_method": "Jeffreys-Dirichlet posterior of the paired (q1, q2) outcomes",
+        "diff_ci95": list(diff_interval(o1, o2, q1, q2, seed=seed, n_draw=n_draw)),
+        "diff_ci95_uniform_prior": list(diff_interval(o1, o2, q1, q2, seed=seed, n_draw=n_draw, prior=1.0)),
+        "diff_ci_method": "equal-tailed 95 % Bayesian credible interval; Jeffreys Dirichlet priors on the q1 "
+                          "outcome and on the continuation of the q1 escapes to q2 (impossible pairs refused); "
+                          "diff_ci95_uniform_prior: the same with uniform priors (prior sensitivity)",
         "diff_ci_note": f"fewer than {MIN_OUTCOME} reactions or escapes at one q: the interval is "
                         "dominated by the prior" if prior_dominated else None,
         "stop_time_ps": {"median": float(np.median(t_stop)), "mean": float(np.mean(t_stop)),
@@ -282,6 +308,9 @@ def main() -> None:
     s.add_argument("--seed", type=int, default=20261002)
     s.add_argument("--chunk", type=int, default=5)
     s.add_argument("--platform", default="CUDA")
+    s.add_argument("--allow-code-change", action="store_true",
+                   help="resume a store written by other code (physics and protocol hashes must still match); "
+                        "only after checking that the code change leaves these shots unchanged")
     s = sub.add_parser("analyze")
     s.add_argument("--store", type=Path, required=True)
     s.add_argument("--stage", default="a3")

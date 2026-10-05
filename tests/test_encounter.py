@@ -267,3 +267,81 @@ def test_a3_difference_interval_covers_zero_when_q_does_not_matter():
     assert lo < hi
     lo1, hi1 = S.diff_interval(["reaction"], ["reaction"], 10.0, 15.0, n_draw=4000)
     assert hi1 - lo1 > 0.05
+
+
+def _shoot_module():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from examples.encounter_pair import shoot as S
+
+    return S
+
+
+@pytest.mark.parametrize("o1, o2", [("reaction", "escape"), ("reaction", "timeout"), ("reaction", "nonfinite"),
+                                    ("timeout", "reaction"), ("timeout", "escape"), ("nonfinite", "escape")])
+def test_a3_paired_outcomes_refuse_impossible_pairs(o1, o2):
+    """q1 < q2 replay one trajectory with one reaction rule: a reaction at q1 is a
+    reaction at q2, and a shot that never left q1 (timeout / non-finite) cannot
+    react or escape at q2 (handoff BUG-03)."""
+    S = _shoot_module()
+    with pytest.raises(ValueError, match="impossible"):
+        S.diff_interval(["escape", o1], ["escape", o2], 10.0, 15.0, n_draw=100)
+
+
+def test_a3_paired_posterior_q1_marginal_is_jeffreys_and_q2_follows_the_continuation():
+    """The q1 outcome ~ Dirichlet(n + 1/2), so beta(q1) ~ Beta(n_R1 + 1/2, n_E1 + 1/2) as
+    in the one-sided estimate; beta(q2) = (r1 + e1 rho) / (r1 + e1 (rho + eps)) with the
+    continuation from q1 (rho, eps) ~ Dirichlet(m + 1/2) over the q1 escapes only."""
+    from scipy import stats
+
+    S = _shoot_module()
+    o1 = ["reaction"] * 2 + ["escape"] * 25 + ["timeout"] * 3
+    o2 = ["reaction"] * 2 + ["reaction"] * 3 + ["escape"] * 20 + ["timeout"] * 2 + ["timeout"] * 3
+    b1, b2 = S.paired_posterior(o1, o2, np.random.Generator(np.random.PCG64(7)), 200_000)
+    qs = np.array([0.025, 0.25, 0.5, 0.75, 0.975])
+    assert np.allclose(np.quantile(b1, qs), stats.beta(2.5, 25.5).ppf(qs), atol=3e-3)
+    assert np.all(b2 >= b1)  # every q1 reaction is a q2 reaction
+    rng = np.random.Generator(np.random.PCG64(8))
+    p1 = rng.dirichlet([2.5, 25.5, 3.5], 200_000)
+    c = rng.dirichlet([3.5, 20.5, 2.5], 200_000)
+    ref = (p1[:, 0] + p1[:, 1] * c[:, 0]) / (p1[:, 0] + p1[:, 1] * (c[:, 0] + c[:, 1]))
+    assert np.allclose(np.quantile(b2, qs), np.quantile(ref, qs), atol=3e-3)
+
+
+def test_a3_difference_interval_coverage_with_known_truth():
+    """Shots simulated from the q1 -> q2 outcome tree with known probabilities: the
+    95 % credible interval of beta_inf(q2) - beta_inf(q1) covers the true difference
+    in >= 90 % of 400 replicates of 30 shots, for a rare and a common reaction."""
+    S = _shoot_module()
+    b, q1, q2, n, reps = 5.0, 10.0, 15.0, 30, 400
+    rng = np.random.Generator(np.random.PCG64(2026))
+    names = np.array(["reaction", "escape", "timeout"])
+    for p1, cont in (((0.03, 0.95, 0.02), (0.02, 0.97, 0.01)), ((0.3, 0.68, 0.02), (0.2, 0.79, 0.01))):
+        r1, e1 = p1[0], p1[1]
+        beta1 = r1 / (r1 + e1)
+        beta2 = (r1 + e1 * cont[0]) / (r1 + e1 * (cont[0] + cont[1]))
+        truth = S.nam_beta_inf_array(beta2, b, q2) - S.nam_beta_inf_array(beta1, b, q1)
+        hits = 0
+        for k in range(reps):
+            a1 = rng.choice(3, size=n, p=p1)
+            a2 = np.where(a1 == 1, rng.choice(3, size=n, p=cont), a1)
+            lo, hi = S.diff_interval(list(names[a1]), list(names[a2]), q1, q2, seed=k, n_draw=2000)
+            hits += lo <= truth <= hi
+        assert hits / reps >= 0.90, (p1, cont, hits / reps)
+
+
+def test_a3_analysis_reports_the_prior_sensitivity_of_the_difference():
+    S = _shoot_module()
+    n = 40
+    recs = [_a3_record(i, list(np.linspace(5.0, 15.0, n)), [0.0] * n, "escape", float(n - 1)) for i in range(5)]
+    recs.append(_a3_record(5, [5.0] * n, [0.0] * 5 + [0.5] * (n - 5), "reaction", 5.0))
+    res = S.analyze_records(recs, n_draw=4000)
+    assert "credible" in res["diff_ci_method"]
+    lo, hi = res["diff_ci95"]
+    ulo, uhi = res["diff_ci95_uniform_prior"]
+    assert lo < hi and ulo < uhi and (lo, hi) != (ulo, uhi)
+    from cytherea.estimate.association import nam_beta_inf
+
+    betas = [0.0, 0.2, 1.0]
+    assert S.nam_beta_inf_array(betas, 5.0, 15.0).tolist() == pytest.approx([nam_beta_inf(x, 5.0, 15.0) for x in betas])
