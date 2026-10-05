@@ -1,15 +1,18 @@
-# A1 alanine dipeptide: reference trajectory (Task 14a)
+# A1 alanine dipeptide: reference (Task 14a) and shooting (Task 14b)
 
-These scripts produce the **ground-truth reference** for acceptance gate A1: one
-trajectory of at least 1 µs and its MSM. They use **plain OpenMM + deeptime** and
-do not import `cytherea`, so the reference cannot share a bug with the engine it
-is checking. The shooting half (Task 14b) comes later.
+The 14a scripts produce the **ground-truth reference** for acceptance gate A1:
+1037 ns in 10 independent trajectories (947 ns after burn-in; the user accepted
+this in place of one ≥ 1 µs trajectory on 2026-10-03) and its MSM. They use
+**plain OpenMM + deeptime** and do not import `cytherea`, so the reference cannot
+share a bug with the engine it is checking. `shoot_a1.py` is the shooting half
+(section 4); it runs through `cytherea`.
 
 | file | role |
 |---|---|
 | `build_system.py` | solvate + minimise + equilibrate; writes the fixed-box production system |
 | `ref_long.py` | long NVT reference, γ = 0.1 ps⁻¹, resumable |
 | `analyze_ref.py` | core-set / transition-based states, reversible MSMs, ITS with block-bootstrap CI, CK test |
+| `shoot_a1.py` | 14b: start frames from the reference, shard configs, analysis of the long shots, PES check |
 | `ala2_common.py` | shared constants, φ/ψ, file formats, **the state definition** (core boxes, `core_labels`, `transition_based_assignment`, `OBS_INTERVAL_PS` = 1 ps, `label_shot`) and `FrameIndex`; no `cytherea` import |
 
 Environment: `mamba activate openmm_dev` (see global constraints). Run the
@@ -139,6 +142,76 @@ On the first 19.53 ns, `shoot_lag_ps` is 100 ps with the default lag list and 70
 
 The output is in `runs/ala2_par/analysis/`.
 
+## 4. Shooting (Task 14b)
+
+Protocol (plan Task 14, revised 2026-10-03): 50 core-interior reference frames per
+state, **10 shots per frame, each `FixedLag(5500 ps)`** = 55 τ ≈ 2·t2, φ/ψ every
+1 ps, the reference propagator. The first τ = 100 ps of every shot is a τ shot
+(14.2); the whole shot gives the core-start T(kτ) up to k = 55, so the CK test
+(14.3) runs on the shots' own data. 150 × 10 × 5.5 ns = 8.25 µs.
+
+```bash
+python examples/alanine_dipeptide/shoot_a1.py frames  --out runs/ala2_shoot/frames
+python examples/alanine_dipeptide/shoot_a1.py configs --frames-dir runs/ala2_shoot/frames --out runs/ala2_shoot/long --shards 8
+cytherea run runs/ala2_shoot/long/shard00.yaml      # one per shard, in parallel under MPS, each pinned to a core
+# on each host, for the stores it owns (a store opens only on its owner host, spec S3):
+python examples/alanine_dipeptide/shoot_a1.py export --stores runs/ala2_shoot/gpu_long/g0[0-3].sqlite \
+       --out runs/ala2_shoot/exports/long --stage a1_long
+python examples/alanine_dipeptide/shoot_a1.py analyze --frames-dir runs/ala2_shoot/frames \
+       --shots-dir runs/ala2_shoot/exports/long --tau-dir runs/ala2_shoot/exports/tau \
+       --out runs/ala2_shoot/analysis_14b.json
+python examples/alanine_dipeptide/shoot_a1.py pes --frames-dir runs/ala2_shoot/frames   # 14.1
+```
+
+### Combining shards from different hosts
+
+After the shard writers finish, run `export` **on each shard's owning host**,
+listing only that host's stores. Each export retains the complete shot record,
+including provenance and nonfinite outcomes. SQLite ownership checks still apply.
+For example, on the host owning GPU shards g00–g03:
+
+```bash
+python examples/alanine_dipeptide/shoot_a1.py export \
+       --stores runs/ala2_shoot/gpu_long/g0{0,1,2,3}.sqlite \
+       --out runs/ala2_shoot/exports/long --stage a1_long
+```
+
+Export the other GPU shards on their owning host into the same export directory
+(each shard has a distinct filename). Export each host's completed CPU shards
+with `--stage a1_tau --out runs/ala2_shoot/exports/tau`, listing the appropriate
+`cpu_tau/cNN.sqlite` files explicitly. The JSONL exports can be transferred or
+read from either host; do not copy live SQLite files or take over production stores.
+
+```bash
+python examples/alanine_dipeptide/shoot_a1.py analyze \
+       --frames-dir runs/ala2_shoot/frames \
+       --shots-dir runs/ala2_shoot/exports/long \
+       --tau-dir runs/ala2_shoot/exports/tau \
+       --out runs/ala2_shoot/analysis_14b.json
+```
+
+Analyze accepts both owned `*.sqlite` stores and exported `*.jsonl` records.
+Include each shard once: mixing a store with its export raises a duplicate-shot
+error rather than counting the same trajectory twice. Re-running export replaces
+that shard's JSONL only after a successful export; partial exports are not published.
+
+* **Frames.** Candidates are the DCD frames (every 10 ps) whose own φ/ψ record has
+  a raw core label ≥ 0, after 10 ns of burn-in per run. Per state, a systematic
+  draw with a seeded random start over the time-ordered candidates spreads the
+  frames over runs and core visits. Every molecule is shifted back into the box
+  as a whole (float64); the IC gate re-projects the constraints, checks
+  `min_pair_dist` with minimum images and draws Maxwell–Boltzmann velocities.
+  `frames.json` records run, DCD frame, time, φ/ψ, state and core visit of each
+  frame. On the reference, αL's 50 frames come from 10 visits in 8 runs, so
+  frames are far from independent there; `analyze` also reports T with core
+  visits as the clusters.
+* **Analysis.** End states at kτ from `label_shot`. T(τ) is the row-normalised
+  core-start estimate (`estimate_T(..., reversible=False)`, frame clusters);
+  ITS come from the reversible MLE (timescales only). The CK test is
+  `cytherea.estimate.ck_test_shots` on the reference's k list (1 … 55). The
+  output compares T element-wise with the 14b contract below and checks 14.2
+  (shooting t2 inside the reference core-start t2 CI) and 14.5 (IC rejections).
+
 ## Tests
 
 * `pytest -q tests/test_ala2_reference.py` (fast) checks:
@@ -149,4 +222,5 @@ The output is in `runs/ala2_par/analysis/`.
   * a two-bridge chain (slow αL-like t2, fast bridged t3): the t2-only lag fails the core-start CK, and the shooting lag is the first lag that passes it;
   * a lumped chain with hidden memory, which the long-horizon CK test must fail;
   * DCD truncation.
+* `pytest -q tests/test_ala2_shoot.py` (fast): DCD frame reading, molecule wrapping, frame selection, shot end states, and T / ITS / CK recovered from synthetic multi-lag shots.
 * `pytest -q -m slow tests/test_ala2_reference.py` (≈ 3.5 min, CPU): builds the system, runs 12 ps with a simulated crash and resumes. It also covers the missing-checkpoint and unreadable-checkpoint fallbacks, checks the formats and runs the analysis.

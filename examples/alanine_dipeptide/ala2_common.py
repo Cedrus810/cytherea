@@ -10,6 +10,7 @@ Contents
 * phi/psi atom lookup and a vectorised dihedral
 * the ``phipsi.bin`` record format (fixed 16-byte records) + loader/truncation
 * DCD truncation (so ``--resume`` can drop frames written after the last checkpoint)
+  and reading one frame (14b start frames)
 * THE conformational-state definition (core boxes, core labels, transition-based
   assignment, the 1 ps observation interval, ``label_shot``) shared by the 14a
   reference analysis and the 14b shooting labels
@@ -157,6 +158,33 @@ def dcd_n_frames(path: str | os.PathLike) -> int:
         header, frame, _, _ = _dcd_layout(fh)
         fh.seek(0, os.SEEK_END)
         return (fh.tell() - header) // frame
+
+
+def read_dcd_frame(path: str | os.PathLike, k: int) -> tuple[np.ndarray, np.ndarray | None]:
+    """DCD frame ``k`` (0-based) as (coordinates in nm, float64 (n, 3); box edge
+    lengths in nm, or None without a unit cell). Only rectangular cells (all
+    angle cosines 0, as ref_long.py writes) are accepted. The coordinates are
+    the float32 Angstrom values on disk, unwrapped (see README)."""
+    with open(path, "rb") as fh:
+        header, frame, _, has_box = _dcd_layout(fh)
+        fh.seek(0, os.SEEK_END)
+        n_present = (fh.tell() - header) // frame
+        if not 0 <= int(k) < n_present:
+            raise IndexError(f"{path}: frame {k} out of range (0..{n_present - 1})")
+        n_atoms = (frame - (56 if has_box else 0)) // 3 // 4 - 2
+        fh.seek(header + int(k) * frame)
+        lengths = None
+        if has_box:
+            a, cos_g, b, cos_b, cos_a, c = struct.unpack("<i6di", fh.read(56))[1:7]
+            if max(abs(cos_g), abs(cos_b), abs(cos_a)) > 1e-6:
+                raise ValueError(f"{path}: frame {k} has a non-rectangular cell")
+            lengths = np.array([a, b, c], dtype=np.float64) / 10.0
+        xyz = np.empty((n_atoms, 3), dtype=np.float64)
+        for i in range(3):
+            fh.seek(4, os.SEEK_CUR)
+            xyz[:, i] = np.frombuffer(fh.read(4 * n_atoms), dtype="<f4")
+            fh.seek(4, os.SEEK_CUR)
+    return xyz / 10.0, lengths
 
 
 def truncate_dcd(path: str | os.PathLike, n_frames: int) -> None:
