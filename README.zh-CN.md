@@ -1,6 +1,6 @@
 # Cytherea
 
-English | [简体中文](README.zh-CN.md)
+[English](README.md) | 简体中文 | [日本語](README.ja.md)
 
 **面向溶液蛋白的瞄准发射 + 加权集合动力学框架,基于 OpenMM。**
 
@@ -52,10 +52,6 @@ cytherea run examples/toy_doublewell/config.yaml
 | `results/` | 支撑 `docs/reports/` 的小型机器可读产物(分析 JSON 等) |
 | `docs/STATUS.md` | 活页状态与交接记录 |
 | `CHANGELOG.md` | 变更日志 |
-
-## 血统
-
-架构上有意重建 VENUS96——把经典轨迹变成动力学——用于溶液中的蛋白质。未使用、未包含任何 VENUS96 或 VENUSpy 源码;Cytherea 是独立实现。
 
 ## 许可证
 

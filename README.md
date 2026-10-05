@@ -1,6 +1,6 @@
 # Cytherea
 
-[English](README.md) | 简体中文
+English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
 **Aimed-shooting and weighted-ensemble kinetics for proteins in solution, built on OpenMM.**
 
@@ -82,12 +82,6 @@ barnase–barstar encounter-sampling pair.
 | `results/` | small machine-readable artifacts (analysis JSONs) backing `docs/reports/` |
 | `docs/STATUS.md` | living status and handoff notes |
 | `CHANGELOG.md` | what changed, when |
-
-## Lineage
-
-The architecture consciously rebuilds VENUS96 — classical trajectories turned into
-kinetics — for proteins in solution. No VENUS96 or VENUSpy source code is used or
-included; Cytherea is an independent implementation.
 
 ## License
 
