@@ -1,0 +1,688 @@
+{
+ "n_shots": 1500,
+ "n_long_shots": 600,
+ "n_frames": 150,
+ "n_visits": 110,
+ "tau_ps": 100.0,
+ "shots_per_state": [
+  500,
+  500,
+  500
+ ],
+ "T": {
+  "matrix": [
+   [
+    0.896,
+    0.102,
+    0.002
+   ],
+   [
+    0.274,
+    0.726,
+    0.0
+   ],
+   [
+    0.022,
+    0.004,
+    0.974
+   ]
+  ],
+  "ci95_lo": [
+   [
+    0.8669660145395677,
+    0.07777172390519893,
+    5.0634334007426673e-05
+   ],
+   [
+    0.23118985059959388,
+    0.6797948123641955,
+    0.0
+   ],
+   [
+    0.01051453829685685,
+    0.000832114721659632,
+    0.9549756413162671
+   ]
+  ],
+  "ci95_hi": [
+   [
+    0.9204670826402631,
+    0.13081816396681792,
+    0.009309481685507251
+   ],
+   [
+    0.3202051876358046,
+    0.7688101494004062,
+    0.009568704404577133
+   ],
+   [
+    0.04091288595875104,
+    0.012769579741978109,
+    0.9863091296889785
+   ]
+  ],
+  "n_eff": [
+   [
+    500.0,
+    500.0,
+    500.0
+   ],
+   [
+    383.667643882117,
+    383.667643882117,
+    383.667643882117
+   ],
+   [
+    368.9300411522638,
+    500.0,
+    405.31370038412285
+   ]
+  ]
+ },
+ "T_parts": {
+  "long_first_tau": {
+   "matrix": [
+    [
+     0.935,
+     0.065,
+     0.0
+    ],
+    [
+     0.27,
+     0.73,
+     0.0
+    ],
+    [
+     0.015,
+     0.005,
+     0.98
+    ]
+   ],
+   "ci95_lo": [
+    [
+     0.8944685111856318,
+     0.03692125935868124,
+     0.0
+    ],
+    [
+     0.21208915815857232,
+     0.6654874393400225,
+     0.0
+    ],
+    [
+     0.004242279146833643,
+     0.00012658102786700098,
+     0.9531534330331577
+    ]
+   ],
+   "ci95_hi": [
+    [
+     0.9630787406413187,
+     0.1055314888143682,
+     0.018275340355136227
+    ],
+    [
+     0.3345125606599775,
+     0.7879108418414277,
+     0.018275340355136227
+    ],
+    [
+     0.039484358645483705,
+     0.02312868201512475,
+     0.9932124011999196
+    ]
+   ],
+   "n_eff": [
+    [
+     200.0,
+     200.0,
+     200.0
+    ],
+    [
+     200.0,
+     200.0,
+     200.0
+    ],
+    [
+     200.0,
+     200.0,
+     200.0
+    ]
+   ]
+  },
+  "tau_only": {
+   "matrix": [
+    [
+     0.87,
+     0.12666666666666668,
+     0.0033333333333333335
+    ],
+    [
+     0.27666666666666667,
+     0.7233333333333334,
+     0.0
+    ],
+    [
+     0.02666666666666667,
+     0.0033333333333333335,
+     0.97
+    ]
+   ],
+   "ci95_lo": [
+    [
+     0.8284501093586378,
+     0.09265875791699557,
+     8.438913231778589e-05
+    ],
+    [
+     0.22031839238948916,
+     0.6610573896708223,
+     0.0
+    ],
+    [
+     0.012109744001108974,
+     8.438913231778589e-05,
+     0.9449040977487185
+    ]
+   ],
+   "ci95_hi": [
+    [
+     0.9044543125671908,
+     0.1678338560735674,
+     0.01547274121347392
+    ],
+    [
+     0.3389426103291777,
+     0.7796816076105108,
+     0.01690006748811279
+    ],
+    [
+     0.05132952863841248,
+     0.01547274121347392,
+     0.9854568164299371
+    ]
+   ],
+   "n_eff": [
+    [
+     300.0,
+     300.0,
+     300.0
+    ],
+    [
+     216.42633982215824,
+     216.42633982215818,
+     216.42633982215818
+    ],
+    [
+     267.88990825688074,
+     300.0,
+     279.21108742004316
+    ]
+   ]
+  }
+ },
+ "T_by_visit_cluster": {
+  "matrix": [
+   [
+    0.896,
+    0.102,
+    0.002
+   ],
+   [
+    0.274,
+    0.726,
+    0.0
+   ],
+   [
+    0.022,
+    0.004,
+    0.974
+   ]
+  ],
+  "ci95_lo": [
+   [
+    0.8669660145395677,
+    0.07777172390519893,
+    5.0634334007426673e-05
+   ],
+   [
+    0.23118985059959388,
+    0.6797948123641955,
+    0.0
+   ],
+   [
+    0.011743472170376086,
+    0.000832114721659632,
+    0.9571983462720723
+   ]
+  ],
+  "ci95_hi": [
+   [
+    0.9204670826402631,
+    0.13081816396681792,
+    0.009309481685507251
+   ],
+   [
+    0.3202051876358046,
+    0.7688101494004062,
+    0.009568704404577133
+   ],
+   [
+    0.037750814207795524,
+    0.012769579741978109,
+    0.9853498305939032
+   ]
+  ],
+  "n_eff": [
+   [
+    500.0,
+    500.0,
+    500.0
+   ],
+   [
+    383.667643882117,
+    383.667643882117,
+    383.667643882117
+   ],
+   [
+    500.0,
+    500.0,
+    500.0
+   ]
+  ]
+ },
+ "its_ps": {
+  "t2": 3628.481168017573,
+  "t3": 211.4547741271392,
+  "t2_ci95": [
+   2370.581627376922,
+   Infinity
+  ],
+  "t3_ci95": [
+   178.4454128571563,
+   255.04717570716153
+  ],
+  "estimator": "reversible MLE of the core-start counts (timescales only)",
+  "row_normalised": [
+   3594.389819057892,
+   211.63732066601838
+  ]
+ },
+ "ck": {
+  "passed": true,
+  "max_dev": 0.12480467555936087,
+  "ks": [
+   1,
+   2,
+   3,
+   4,
+   6,
+   9,
+   13,
+   18,
+   27,
+   38,
+   55
+  ],
+  "horizon_ps": 5500.0,
+  "n_boot": 500,
+  "T_tau_from": "all shots",
+  "test": "ck_test_shots, frame-clustered bootstrap stratified by start state",
+  "rows": [
+   {
+    "k": 1,
+    "lag_ps": 100.0,
+    "predicted_stay": [
+     0.896,
+     0.726,
+     0.974
+    ],
+    "estimated_stay": [
+     0.935,
+     0.73,
+     0.98
+    ]
+   },
+   {
+    "k": 2,
+    "lag_ps": 200.0,
+    "predicted_stay": [
+     0.8308080000000001,
+     0.555024,
+     0.94872
+    ],
+    "estimated_stay": [
+     0.795,
+     0.54,
+     0.95
+    ]
+   },
+   {
+    "k": 3,
+    "lag_ps": 300.0,
+    "predicted_stay": [
+     0.789820096,
+     0.44828127199999995,
+     0.924137752
+    ],
+    "estimated_stay": [
+     0.76,
+     0.41,
+     0.925
+    ]
+   },
+   {
+    "k": 4,
+    "lag_ps": 400.0,
+    "predicted_stay": [
+     0.7639313969600001,
+     0.38158809814399997,
+     0.900232557152
+    ],
+    "estimated_stay": [
+     0.715,
+     0.385,
+     0.895
+    ]
+   },
+   {
+    "k": 6,
+    "lag_ps": 600.0,
+    "predicted_stay": [
+     0.7368825847345092,
+     0.3137191750560901,
+     0.8543760453081226
+    ],
+    "estimated_stay": [
+     0.7,
+     0.31,
+     0.855
+    ]
+   },
+   {
+    "k": 9,
+    "lag_ps": 900.0,
+    "predicted_stay": [
+     0.7222079473346502,
+     0.2803100061813644,
+     0.7902067890235275
+    ],
+    "estimated_stay": [
+     0.665,
+     0.26,
+     0.755
+    ]
+   },
+   {
+    "k": 13,
+    "lag_ps": 1300.0,
+    "predicted_stay": [
+     0.7158706680982717,
+     0.270216762676638,
+     0.712570810022127
+    ],
+    "estimated_stay": [
+     0.72,
+     0.21,
+     0.645
+    ]
+   },
+   {
+    "k": 18,
+    "lag_ps": 1800.0,
+    "predicted_stay": [
+     0.7119910278868833,
+     0.2673475538984851,
+     0.6269213512633831
+    ],
+    "estimated_stay": [
+     0.725,
+     0.23,
+     0.505
+    ]
+   },
+   {
+    "k": 27,
+    "lag_ps": 2700.0,
+    "predicted_stay": [
+     0.7069687289922684,
+     0.2650433939096396,
+     0.49980467555936087
+    ],
+    "estimated_stay": [
+     0.73,
+     0.235,
+     0.375
+    ]
+   },
+   {
+    "k": 38,
+    "lag_ps": 3800.0,
+    "predicted_stay": [
+     0.7023649393558745,
+     0.263040641716051,
+     0.3820206095399722
+    ],
+    "estimated_stay": [
+     0.745,
+     0.235,
+     0.3
+    ]
+   },
+   {
+    "k": 55,
+    "lag_ps": 5500.0,
+    "predicted_stay": [
+     0.6975199910737755,
+     0.2609348018392748,
+     0.2580457210303583
+    ],
+    "estimated_stay": [
+     0.685,
+     0.28,
+     0.15
+    ]
+   }
+  ]
+ },
+ "n_nonfinite": 0,
+ "valid": true,
+ "stores": {
+  "long": [
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g00.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g01.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g02.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g03.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g04.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g05.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g06.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/long/g07.jsonl"
+  ],
+  "tau_only": [
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c00.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c01.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c02.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c03.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c04.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c05.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c06.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c07.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c08.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c09.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c10.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c11.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c12.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c13.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c14.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c15.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c16.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c17.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c18.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c19.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c20.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c21.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c22.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c23.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c24.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c25.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c26.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c27.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c28.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c29.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c30.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c31.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c32.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c33.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c34.jsonl",
+   "/tmp/claude-1000/-home-ruigengji-cytherea/e92399ea-9d84-4d85-a2a5-9f2ad7530a69/scratchpad/a1/tau/c35.jsonl"
+  ]
+ },
+ "spread": {
+  "C7eq/C5": {
+   "n_frames": 50,
+   "n_runs": 9,
+   "n_visits": 50
+  },
+  "alphaR": {
+   "n_frames": 50,
+   "n_runs": 9,
+   "n_visits": 50
+  },
+  "alphaL": {
+   "n_frames": 50,
+   "n_runs": 8,
+   "n_visits": 10
+  }
+ },
+ "ic": {
+  "n_accepted": 1500,
+  "n_rejected_attempts": 0,
+  "rejection_rate": 0.0,
+  "reasons": {},
+  "acceptance_14_5": {
+   "passed": true
+  }
+ },
+ "acceptance_14_3": {
+  "passed": true
+ },
+ "reference": {
+  "T_ref": [
+   [
+    0.8860616093144553,
+    0.11254966877209856,
+    0.0013887219134460958
+   ],
+   [
+    0.3012760004617777,
+    0.6979023068512872,
+    0.0008216926869350862
+   ],
+   [
+    0.03157204763118605,
+    0.0033502057463311607,
+    0.9650777466224828
+   ]
+  ],
+  "T_ref_ci95_lo": [
+   [
+    0.8796648721781948,
+    0.10619584202375067,
+    0.0007124455210882267
+   ],
+   [
+    0.29120432983032124,
+    0.6882289504098607,
+    0.0
+   ],
+   [
+    0.02092926172845483,
+    0.0,
+    0.9367289028780025
+   ]
+  ],
+  "T_ref_ci95_hi": [
+   [
+    0.8926283994202925,
+    0.11896055070432691,
+    0.0020425749008433553
+   ],
+   [
+    0.31138848802947816,
+    0.7084138431726257,
+    0.0017791643312823602
+   ],
+   [
+    0.0584286199654065,
+    0.008377295445633474,
+    0.9762777747991523
+   ]
+  ],
+  "T_shoot_minus_ref": [
+   [
+    0.009938390685544696,
+    -0.010549668772098564,
+    0.0006112780865539043
+   ],
+   [
+    -0.027276000461777694,
+    0.0280976931487128,
+    -0.0008216926869350862
+   ],
+   [
+    -0.009572047631186048,
+    0.0006497942536688394,
+    0.008922253377517175
+   ]
+  ],
+  "intervals_overlap": [
+   [
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true
+   ]
+  ],
+  "ref_in_shoot_ci": [
+   [
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true
+   ]
+  ],
+  "t2_ref_ps": 2718.199555609931,
+  "t2_ref_ci95_ps": [
+   1512.4941624752146,
+   3957.6566784210036
+  ],
+  "t3_ref_ps": 186.61375631532465,
+  "t3_ref_ci95_ps": [
+   179.25984835031738,
+   194.2788847005208
+  ],
+  "acceptance_14_2": {
+   "passed": true,
+   "t2_shoot_ps": 3628.481168017573,
+   "rule": "shooting t2 inside the reference core-start t2 95% CI at tau"
+  }
+ }
+}

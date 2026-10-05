@@ -1,0 +1,2225 @@
+{
+  "input": [
+    "runs/ala2_ref/phipsi.bin (2 pieces)",
+    "runs/ala2_par/r01/phipsi.bin",
+    "runs/ala2_par/r02/phipsi.bin",
+    "runs/ala2_par/r03/phipsi.bin",
+    "runs/ala2_par/r04/phipsi.bin",
+    "runs/ala2_par/r05/phipsi.bin",
+    "runs/ala2_par/r06/phipsi.bin",
+    "runs/ala2_par/r07/phipsi.bin",
+    "runs/ala2_par/r08/phipsi.bin"
+  ],
+  "n_trajectories": 10,
+  "trajectory_ns": [
+    113.545,
+    113.544,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0
+  ],
+  "n_records": 1037099,
+  "skip_ps": 10000.0,
+  "skip_applies_to": "the start of every --run",
+  "frame_interval_ps": 1.0,
+  "obs_interval_ps": 1.0,
+  "obs_interval_matches_state_contract": true,
+  "simulated_ns": 947.089,
+  "states": [
+    "C7eq/C5",
+    "alphaR",
+    "alphaL"
+  ],
+  "core_boxes_deg": {
+    "C7eq/C5": {
+      "phi": [
+        [
+          -180,
+          -30
+        ]
+      ],
+      "psi": [
+        [
+          100,
+          180
+        ],
+        [
+          -180,
+          -160
+        ]
+      ]
+    },
+    "alphaR": {
+      "phi": [
+        [
+          -180,
+          -30
+        ]
+      ],
+      "psi": [
+        [
+          -80,
+          -10
+        ]
+      ]
+    },
+    "alphaL": {
+      "phi": [
+        [
+          30,
+          100
+        ]
+      ],
+      "psi": [
+        [
+          0,
+          90
+        ]
+      ]
+    }
+  },
+  "state_definition": "ala2_common.CORE_BOXES_DEG / core_labels / transition_based_assignment at OBS_INTERVAL_PS = 1 ps",
+  "assignment": "transition-based (last core visited); leading non-core frames dropped",
+  "visited_states": [
+    "C7eq/C5",
+    "alphaR",
+    "alphaL"
+  ],
+  "never_visited_states": [],
+  "estimator": "deeptime MaximumLikelihoodMSM(reversible=True) on the largest strongly connected count set",
+  "n_leading_frames_dropped": 3,
+  "fraction_frames_in_core": {
+    "C7eq/C5": 0.6856041448676432,
+    "alphaR": 0.15575668435929085,
+    "alphaL": 0.02899485692625586
+  },
+  "fraction_frames_noncore": 0.1296443138468101,
+  "fraction_tba": {
+    "C7eq/C5": 0.7004084063283975,
+    "alphaR": 0.26289520808872596,
+    "alphaL": 0.036696385582876495
+  },
+  "core_to_core_transitions": {
+    "C7eq/C5->alphaR": 1100,
+    "C7eq/C5->alphaL": 11,
+    "alphaR->C7eq/C5": 1096,
+    "alphaR->alphaL": 1,
+    "alphaL->C7eq/C5": 12,
+    "alphaL->alphaR": 0
+  },
+  "bootstrap": {
+    "n_blocks": 20,
+    "block_ns": 45.0,
+    "n_boot": 200,
+    "rng": "numpy PCG64(seed=1)",
+    "replicate_policy": "replicates whose largest connected set differs from the full estimate's are EXCLUDED (counted in n_boot_excluded_active_set_mismatch); replicates with an infinite timescale are dropped (n_boot_valid)",
+    "ci_valid_rule": "at most 5% of the replicates lost"
+  },
+  "lags_dropped_ps": [],
+  "implied_timescales": [
+    {
+      "lag_ps": 1.0,
+      "lag_frames": 1,
+      "timescales_ps": [
+        2791.343825359589,
+        164.30280384635222
+      ],
+      "ci95_lo_ps": [
+        1723.1363236345787,
+        159.23365122677347
+      ],
+      "ci95_hi_ps": [
+        4061.2432489875946,
+        169.51124062592586
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 947086.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6999018852770791,
+        0.26342163881482006,
+        0.03667647590810087
+      ]
+    },
+    {
+      "lag_ps": 2.0,
+      "lag_frames": 2,
+      "timescales_ps": [
+        2790.807716303027,
+        164.02429208213022
+      ],
+      "ci95_lo_ps": [
+        1722.2715336597885,
+        158.87910582009172
+      ],
+      "ci95_hi_ps": [
+        4060.521961862631,
+        169.4764303270889
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 947076.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6999029841678571,
+        0.2634212072582879,
+        0.036675808573854884
+      ]
+    },
+    {
+      "lag_ps": 5.0,
+      "lag_frames": 5,
+      "timescales_ps": [
+        2789.32070920165,
+        165.10187852780757
+      ],
+      "ci95_lo_ps": [
+        1719.7235040805779,
+        159.8659671326853
+      ],
+      "ci95_hi_ps": [
+        4058.237240286723,
+        170.58745215724537
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 947046.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6998321049238951,
+        0.2634949216587762,
+        0.03667297341732877
+      ]
+    },
+    {
+      "lag_ps": 10.0,
+      "lag_frames": 10,
+      "timescales_ps": [
+        2786.8666051735263,
+        167.98828053085992
+      ],
+      "ci95_lo_ps": [
+        1715.4926351178813,
+        162.76064094431695
+      ],
+      "ci95_hi_ps": [
+        4054.362202125288,
+        173.26343079329644
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 946996.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.699837403034266,
+        0.2634879448983904,
+        0.036674652067343654
+      ]
+    },
+    {
+      "lag_ps": 20.0,
+      "lag_frames": 20,
+      "timescales_ps": [
+        2781.962669018238,
+        173.34646240459384
+      ],
+      "ci95_lo_ps": [
+        1707.0187601102882,
+        167.15374055986754
+      ],
+      "ci95_hi_ps": [
+        4046.6172726085274,
+        178.64380174431207
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 946896.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6998407039112668,
+        0.26348119880042536,
+        0.036678097288307794
+      ]
+    },
+    {
+      "lag_ps": 50.0,
+      "lag_frames": 50,
+      "timescales_ps": [
+        2766.324033539547,
+        176.72597956082276
+      ],
+      "ci95_lo_ps": [
+        1681.1405830968483,
+        169.89868212132362
+      ],
+      "ci95_hi_ps": [
+        4022.2371502951373,
+        182.52645320833855
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 946596.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6998468552436798,
+        0.2634594682180171,
+        0.03669367653830309
+      ]
+    },
+    {
+      "lag_ps": 100.0,
+      "lag_frames": 100,
+      "timescales_ps": [
+        2841.5057621668684,
+        175.72061355449213
+      ],
+      "ci95_lo_ps": [
+        1638.1679508458506,
+        168.63146941195978
+      ],
+      "ci95_hi_ps": [
+        4075.5804583969766,
+        182.09579110456255
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 946096.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6997731550544526,
+        0.26351020246275003,
+        0.03671664248279735
+      ]
+    },
+    {
+      "lag_ps": 200.0,
+      "lag_frames": 200,
+      "timescales_ps": [
+        2864.2337801399153,
+        176.46573684702508
+      ],
+      "ci95_lo_ps": [
+        1551.1170717668867,
+        168.34928908281424
+      ],
+      "ci95_hi_ps": [
+        4123.127104041588,
+        186.42163088078928
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 945096.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6997431509709559,
+        0.2634916572149171,
+        0.0367651918141271
+      ]
+    },
+    {
+      "lag_ps": 500.0,
+      "lag_frames": 500,
+      "timescales_ps": [
+        2904.2800874824443,
+        184.0937312439589
+      ],
+      "ci95_lo_ps": [
+        1601.9717178362553,
+        156.72376219846714
+      ],
+      "ci95_hi_ps": [
+        4266.013389656649,
+        206.6731779943214
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 942096.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6999243544346756,
+        0.2631842536843127,
+        0.03689139188101165
+      ]
+    },
+    {
+      "lag_ps": 1000.0,
+      "lag_frames": 1000,
+      "timescales_ps": [
+        2942.4586086698723,
+        250.52872784643554
+      ],
+      "ci95_lo_ps": [
+        1688.3483595949992,
+        163.5839641789554
+      ],
+      "ci95_hi_ps": [
+        4369.50543105232,
+        328.5208073119112
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 937096.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6991878202166012,
+        0.26372456198498245,
+        0.037087617798416406
+      ]
+    },
+    {
+      "lag_ps": 2000.0,
+      "lag_frames": 2000,
+      "timescales_ps": [
+        2907.9163091547007,
+        429.8942251766578
+      ],
+      "ci95_lo_ps": [
+        1519.5569792667297,
+        261.54518888533886
+      ],
+      "ci95_hi_ps": [
+        4218.29987698467,
+        559.1557851067466
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "n_boot_valid": [
+        200,
+        200
+      ],
+      "ci_valid": [
+        true,
+        true
+      ],
+      "n_counts": 927096.0,
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "active_complete": true,
+      "lag_exceeds_t2": false,
+      "stationary": [
+        0.6997165173868665,
+        0.26278001112968336,
+        0.037503471483450124
+      ]
+    }
+  ],
+  "tba_converged_lag_ps": 1.0,
+  "tba_convergence": {
+    "rule": "95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 0 ps",
+    "min_lag_ps": 0.0,
+    "lag_exceeds_t2_ps": [],
+    "left_out_invalid_ci_or_incomplete_ps": [],
+    "rejected_by_accept_ps": []
+  },
+  "shoot_lag_ps": 100.0,
+  "shoot_lag": {
+    "lag_ps": 100.0,
+    "source": "converged core-start t2 with a passing core-start CK (95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 10 ps; and the core-start CK at that lag passes (pass = true))",
+    "min_lag_ps": 10.0,
+    "below_min_lag": false,
+    "core_start_converged_lag_ps": 5.0,
+    "rule": "95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 10 ps; and the core-start CK at that lag passes (pass = true)",
+    "t2_only_lag_ps": 10.0,
+    "t2_only_note": "the t2 rule alone, without the CK condition (the pre-2026-10-02 shooting lag)",
+    "ck_scan": [
+      {
+        "lag_ps": 10.0,
+        "pass": false,
+        "null_reason": null
+      },
+      {
+        "lag_ps": 20.0,
+        "pass": false,
+        "null_reason": null
+      },
+      {
+        "lag_ps": 50.0,
+        "pass": false,
+        "null_reason": null
+      },
+      {
+        "lag_ps": 100.0,
+        "pass": true,
+        "null_reason": null
+      },
+      {
+        "lag_ps": 200.0,
+        "pass": true,
+        "null_reason": null
+      }
+    ],
+    "tol_only_lag_ps": 200.0,
+    "tol_only_note": "same rule without the paired-ratio clause (relative tolerance only), CK condition kept",
+    "lag_exceeds_t2_ps": [],
+    "why_min_lag": "shots shorter than ~10 observation intervals from core frames almost never reach another core (transitions pass through the non-core bridge), so core-start T(tau) is dominated by the short-tau bias rather than the barrier-crossing kinetics"
+  },
+  "msm": {
+    "lag_ps": 1.0,
+    "counting": "tba",
+    "estimator": "deeptime MaximumLikelihoodMSM(reversible=True) on the largest strongly connected count set",
+    "count_matrix": [
+      [
+        662237.0,
+        1100.0,
+        11.0
+      ],
+      [
+        1096.0,
+        247886.0,
+        1.0
+      ],
+      [
+        12.0,
+        0.0,
+        34743.0
+      ]
+    ],
+    "active_states": [
+      "C7eq/C5",
+      "alphaR",
+      "alphaL"
+    ],
+    "complete_state_set": true,
+    "never_visited_states": [],
+    "transition_matrix": [
+      [
+        0.9983251622870933,
+        0.0016574999245108526,
+        1.733778839589704e-05
+      ],
+      [
+        0.0044039180957148975,
+        0.9955940763047026,
+        2.005599582447064e-06
+      ],
+      [
+        0.00033085923906853106,
+        1.4404828196473139e-05,
+        0.9996547359327349
+      ]
+    ],
+    "transition_matrix_ci95_lo": [
+      [
+        0.9982521143840766,
+        0.001585258990219125,
+        8.864150340684699e-06
+      ],
+      [
+        0.004216806242549178,
+        0.9954295089425378,
+        0.0
+      ],
+      [
+        0.00021943414293667542,
+        0.0,
+        0.999431545769105
+      ]
+    ],
+    "transition_matrix_ci95_hi": [
+      [
+        0.9983978666755169,
+        0.0017309775318219592,
+        2.601104003718839e-05
+      ],
+      [
+        0.004568268147140713,
+        0.9957810642425442,
+        7.021663765399592e-06
+      ],
+      [
+        0.0005483373644094444,
+        5.666075330903712e-05,
+        0.999765899511318
+      ]
+    ],
+    "transition_matrix_row_normalised": [
+      [
+        0.99832516265972,
+        0.0016582547923563499,
+        1.65825479235635e-05
+      ],
+      [
+        0.0044019069575031225,
+        0.995594076704032,
+        4.016338464875112e-06
+      ],
+      [
+        0.0003452740612861459,
+        0.0,
+        0.9996547259387139
+      ]
+    ],
+    "transition_matrix_row_normalised_ci95_lo": [
+      [
+        0.9982521139565088,
+        0.0015853313547889057,
+        7.63956974515135e-06
+      ],
+      [
+        0.004214667662423094,
+        0.9954295085464077,
+        0.0
+      ],
+      [
+        0.00023410980415041708,
+        0.0,
+        0.9994315362799407
+      ]
+    ],
+    "transition_matrix_row_normalised_ci95_hi": [
+      [
+        0.9983978668477089,
+        0.001731651713974976,
+        2.4762806600449546e-05
+      ],
+      [
+        0.004566348851984247,
+        0.9957810650163583,
+        1.252785003394553e-05
+      ],
+      [
+        0.0005684637200592235,
+        0.0,
+        0.9997658901958496
+      ]
+    ],
+    "row_normalised_n_boot_valid_per_row": [
+      200,
+      200,
+      200
+    ],
+    "row_normalised_ci_valid_per_row": [
+      true,
+      true,
+      true
+    ],
+    "note": "transition_matrix = reversible MLE (use for ITS / populations); transition_matrix_row_normalised = C_ij / sum_j C_ij (design-independent; 14b compares THIS)",
+    "stationary_population": {
+      "C7eq/C5": {
+        "value": 0.6999018852770791,
+        "ci95": [
+          0.6764857059592465,
+          0.7210461241934395
+        ]
+      },
+      "alphaR": {
+        "value": 0.26342163881482006,
+        "ci95": [
+          0.2518897843756348,
+          0.27635773804203373
+        ]
+      },
+      "alphaL": {
+        "value": 0.03667647590810087,
+        "ci95": [
+          0.012906659467083241,
+          0.061036890833868596
+        ]
+      }
+    },
+    "timescales_ps": [
+      2791.343825359589,
+      164.30280384635222
+    ],
+    "n_boot_used": 200,
+    "n_boot_excluded_active_set_mismatch": 0,
+    "ci_valid": true,
+    "lag_source": "converged TBA ITS (95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 0 ps)"
+  },
+  "msm_null_reason": null,
+  "ck_test": {
+    "counting": "tba",
+    "tau_ps": 1.0,
+    "t2_ps": 2791.343825359589,
+    "k": [
+      1,
+      2,
+      5,
+      11,
+      23,
+      50,
+      111,
+      242,
+      531,
+      1163,
+      2548,
+      5583
+    ],
+    "horizon_ps": 5583.0,
+    "horizon_target_ps": 5582.687650719178,
+    "horizon_reaches_t2": true,
+    "horizon_note": null,
+    "rows": [
+      {
+        "k": 1,
+        "lag_ps": 1.0,
+        "predicted_stay": [
+          0.9983251622870933,
+          0.9955940763047026,
+          0.9996547359327349
+        ],
+        "estimated_stay": [
+          0.9983251622870933,
+          0.9955940763047026,
+          0.9996547359327349
+        ],
+        "estimated_ci95_lo": [
+          0.9982521143840766,
+          0.9954295089425378,
+          0.999431545769105
+        ],
+        "estimated_ci95_hi": [
+          0.9983978666755169,
+          0.9957810642425442,
+          0.999765899511318
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 2,
+        "lag_ps": 2.0,
+        "predicted_stay": [
+          0.9966604348858299,
+          0.9912148642958156,
+          0.9993095968380038
+        ],
+        "estimated_stay": [
+          0.9966548172034323,
+          0.9912000606519189,
+          0.99930946186313
+        ],
+        "estimated_ci95_lo": [
+          0.9965087954555687,
+          0.9908712319645323,
+          0.9988628446921978
+        ],
+        "estimated_ci95_hi": [
+          0.9967986210498239,
+          0.9915832242468853,
+          0.9995317805702227
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 5,
+        "lag_ps": 5.0,
+        "predicted_stay": [
+          0.9917263031202761,
+          0.9782358825581265,
+          0.998274928862607
+        ],
+        "estimated_stay": [
+          0.9917627226351876,
+          0.9783423368838235,
+          0.9982736396665666
+        ],
+        "estimated_ci95_lo": [
+          0.9913877474089448,
+          0.9775479610067345,
+          0.9971553158513943
+        ],
+        "estimated_ci95_hi": [
+          0.9921363039473224,
+          0.9792689330070742,
+          0.998829368938926
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 11,
+        "lag_ps": 11.0,
+        "predicted_stay": [
+          0.9821228547786142,
+          0.9529775616764532,
+          0.9962089600801464
+        ],
+        "estimated_stay": [
+          0.9825627058980564,
+          0.9541696790581733,
+          0.9962019952521519
+        ],
+        "estimated_ci95_lo": [
+          0.9816970824760356,
+          0.952387754352433,
+          0.9937338295040306
+        ],
+        "estimated_ci95_hi": [
+          0.9834180278772102,
+          0.9560078343763231,
+          0.9974242989889276
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 23,
+        "lag_ps": 23.0,
+        "predicted_stay": [
+          0.9639312483640516,
+          0.9051432896283735,
+          0.9920904517998587
+        ],
+        "estimated_stay": [
+          0.9658257676012914,
+          0.9102421930353362,
+          0.9920587064570814
+        ],
+        "estimated_ci95_lo": [
+          0.9639093999352955,
+          0.9068740954579505,
+          0.9868650284883366
+        ],
+        "estimated_ci95_hi": [
+          0.9676878758918477,
+          0.9133892984498885,
+          0.9946119235402796
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 50,
+        "lag_ps": 50.0,
+        "predicted_stay": [
+          0.927522324244096,
+          0.8094633755157237,
+          0.9828888703390846
+        ],
+        "estimated_stay": [
+          0.9318826893597607,
+          0.8210459882829372,
+          0.9827363066341195
+        ],
+        "estimated_ci95_lo": [
+          0.9279753553784037,
+          0.8139150365517165,
+          0.9712831135688654
+        ],
+        "estimated_ci95_hi": [
+          0.9356082396170751,
+          0.8274872129112059,
+          0.9882625295265047
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 111,
+        "lag_ps": 111.0,
+        "predicted_stay": [
+          0.8641804598622895,
+          0.6432669334983482,
+          0.9624273259195059
+        ],
+        "estimated_stay": [
+          0.8706037672867751,
+          0.6598866688803138,
+          0.9631995490368012
+        ],
+        "estimated_ci95_lo": [
+          0.8635002911160669,
+          0.6493778748777322,
+          0.9354176300027969
+        ],
+        "estimated_ci95_hi": [
+          0.8777696118040786,
+          0.6716380397678713,
+          0.974349282719007
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 242,
+        "lag_ps": 242.0,
+        "predicted_stay": [
+          0.7863009484175915,
+          0.4399410407321938,
+          0.9199751742314322
+        ],
+        "estimated_stay": [
+          0.7941915144109638,
+          0.459117925403997,
+          0.9219105252337071
+        ],
+        "estimated_ci95_lo": [
+          0.7821119189983006,
+          0.443118637609909,
+          0.855757085906688
+        ],
+        "estimated_ci95_hi": [
+          0.8052393643992555,
+          0.4761689343375583,
+          0.9452150215651163
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 531,
+        "lag_ps": 531.0,
+        "predicted_stay": [
+          0.7318977152520272,
+          0.30126324682427535,
+          0.8330920737479073
+        ],
+        "estimated_stay": [
+          0.7371023064973943,
+          0.31006278659226294,
+          0.8387570062637631
+        ],
+        "estimated_ci95_lo": [
+          0.7241271451840549,
+          0.28717385895597564,
+          0.7249721217335438
+        ],
+        "estimated_ci95_hi": [
+          0.747113017188363,
+          0.33240961871504154,
+          0.8878860657629355
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 1163,
+        "lag_ps": 1163.0,
+        "predicted_stay": [
+          0.7170035894773275,
+          0.2713669790084472,
+          0.671727341098029
+        ],
+        "estimated_stay": [
+          0.7130227898843969,
+          0.25758115300495793,
+          0.6897137053856176
+        ],
+        "estimated_ci95_lo": [
+          0.698144457185911,
+          0.24042063287972537,
+          0.5046501213561647
+        ],
+        "estimated_ci95_hi": [
+          0.7271052976586516,
+          0.27692284519651394,
+          0.7774026356458784
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 2548,
+        "lag_ps": 2548.0,
+        "predicted_stay": [
+          0.7101734606267124,
+          0.2678869194166215,
+          0.42332971365304456
+        ],
+        "estimated_stay": [
+          0.7109368814229141,
+          0.27519721356227345,
+          0.4118831799954538
+        ],
+        "estimated_ci95_lo": [
+          0.6945935687436314,
+          0.2518239135115935,
+          0.14528598344740135
+        ],
+        "estimated_ci95_hi": [
+          0.7333257556938679,
+          0.30236032444913663,
+          0.5492982959987981
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      },
+      {
+        "k": 5583,
+        "lag_ps": 5583.0,
+        "predicted_stay": [
+          0.7033647133520267,
+          0.2649269690204655,
+          0.1670284577950183
+        ],
+        "estimated_stay": [
+          0.6948778491491459,
+          0.2529888637081205,
+          0.08459214532145409
+        ],
+        "estimated_ci95_lo": [
+          0.6701876164920703,
+          0.224198141577347,
+          0.0
+        ],
+        "estimated_ci95_hi": [
+          0.7202555559199216,
+          0.2810953383334597,
+          0.2243537077597808
+        ],
+        "within_ci": [
+          true,
+          true,
+          true
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "ci_valid": true
+      }
+    ],
+    "pass": true,
+    "criterion": "diag(T(tau)^k) inside [2.5,97.5]% bootstrap interval of diag(T_est(k tau)) +/- 0.01, k geometric up to max(5, ceil(2 t2 / tau))"
+  },
+  "ck_null_reason": null,
+  "core_start": {
+    "definition": "C_ij(tau) = #{t : raw core label at t = i (frame INSIDE core i), TBA label at t+tau = j}; the quantity estimated by 14b FixedLag shots launched from core frames and labelled by the last core visited (seeded with the start core)",
+    "implied_timescales": [
+      {
+        "lag_ps": 1.0,
+        "lag_frames": 1,
+        "timescales_ps": [
+          4870.953739813418,
+          3300.2957088417907
+        ],
+        "ci95_lo_ps": [
+          3597.6664619176086,
+          2307.9184619096422
+        ],
+        "ci95_hi_ps": [
+          7551.844201626852,
+          4432.401011906049
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 824304.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.8573680570044677,
+          0.115438670819066,
+          0.027193272176466304
+        ]
+      },
+      {
+        "lag_ps": 2.0,
+        "lag_frames": 2,
+        "timescales_ps": [
+          3156.4489965524585,
+          1738.126622166618
+        ],
+        "ci95_lo_ps": [
+          2337.736580033984,
+          1519.6021924353495
+        ],
+        "ci95_hi_ps": [
+          4741.417333939244,
+          1985.3209325450337
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 824295.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7892774682783986,
+          0.17930509391610214,
+          0.031417437805499326
+        ]
+      },
+      {
+        "lag_ps": 5.0,
+        "lag_frames": 5,
+        "timescales_ps": [
+          2947.550657008223,
+          562.2872383692068
+        ],
+        "ci95_lo_ps": [
+          2018.1729741585455,
+          516.6735551112148
+        ],
+        "ci95_hi_ps": [
+          4691.346861613488,
+          618.9877971066818
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 824270.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7655943305562015,
+          0.1991488238945612,
+          0.03525684554923728
+        ]
+      },
+      {
+        "lag_ps": 10.0,
+        "lag_frames": 10,
+        "timescales_ps": [
+          2881.689923677686,
+          316.1711821579178
+        ],
+        "ci95_lo_ps": [
+          1909.2889842966267,
+          302.0456548053775
+        ],
+        "ci95_hi_ps": [
+          4666.9221593651155,
+          333.8694395606364
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 824231.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7426277309314393,
+          0.22323224380356144,
+          0.03414002526499928
+        ]
+      },
+      {
+        "lag_ps": 20.0,
+        "lag_frames": 20,
+        "timescales_ps": [
+          2804.8995335836767,
+          237.7883207438316
+        ],
+        "ci95_lo_ps": [
+          1893.1751588043044,
+          229.3222307381133
+        ],
+        "ci95_hi_ps": [
+          4611.1312987831725,
+          248.0624680263034
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 824147.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7195246886826884,
+          0.2481081739753865,
+          0.03236713734192519
+        ]
+      },
+      {
+        "lag_ps": 50.0,
+        "lag_frames": 50,
+        "timescales_ps": [
+          2686.9364767436314,
+          201.15820889992855
+        ],
+        "ci95_lo_ps": [
+          1747.6887137994806,
+          193.6789258082834
+        ],
+        "ci95_hi_ps": [
+          4243.648599538916,
+          208.6471760196
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 823911.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7058804371274707,
+          0.26130208554352985,
+          0.03281747732899945
+        ]
+      },
+      {
+        "lag_ps": 100.0,
+        "lag_frames": 100,
+        "timescales_ps": [
+          2718.199555609931,
+          186.61375631532465
+        ],
+        "ci95_lo_ps": [
+          1512.4941624752146,
+          179.25984835031738
+        ],
+        "ci95_hi_ps": [
+          3957.6566784210036,
+          194.2788847005208
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 823516.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7038912531284508,
+          0.2626287078029818,
+          0.033480039068567446
+        ]
+      },
+      {
+        "lag_ps": 200.0,
+        "lag_frames": 200,
+        "timescales_ps": [
+          2999.437965048492,
+          180.795810535359
+        ],
+        "ci95_lo_ps": [
+          1525.5342449633176,
+          172.58307165700987
+        ],
+        "ci95_hi_ps": [
+          5371.785358702096,
+          190.5766543532012
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 822645.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.701185467367876,
+          0.2623705277160414,
+          0.03644400491608255
+        ]
+      },
+      {
+        "lag_ps": 500.0,
+        "lag_frames": 500,
+        "timescales_ps": [
+          2850.915584900493,
+          184.58982510364135
+        ],
+        "ci95_lo_ps": [
+          1311.554379910915,
+          156.25634963011913
+        ],
+        "ci95_hi_ps": [
+          4523.38181354029,
+          208.34096916985283
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 819792.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.7027292110197816,
+          0.26319552569531823,
+          0.03407526328490029
+        ]
+      },
+      {
+        "lag_ps": 1000.0,
+        "lag_frames": 1000,
+        "timescales_ps": [
+          2979.138256825439,
+          254.44553181962485
+        ],
+        "ci95_lo_ps": [
+          1607.8680843757404,
+          167.4965837048591
+        ],
+        "ci95_hi_ps": [
+          4879.863656281742,
+          332.5152591617207
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 815199.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.6999266581412318,
+          0.26386300759861336,
+          0.0362103342601548
+        ]
+      },
+      {
+        "lag_ps": 2000.0,
+        "lag_frames": 2000,
+        "timescales_ps": [
+          2971.663686439028,
+          429.35824394582926
+        ],
+        "ci95_lo_ps": [
+          1439.0763260853905,
+          262.20808822952813
+        ],
+        "ci95_hi_ps": [
+          4318.096622595408,
+          561.8348389304682
+        ],
+        "n_boot_used": 200,
+        "n_boot_excluded_active_set_mismatch": 0,
+        "n_boot_valid": [
+          200,
+          200
+        ],
+        "ci_valid": [
+          true,
+          true
+        ],
+        "n_counts": 806169.0,
+        "active_states": [
+          "C7eq/C5",
+          "alphaR",
+          "alphaL"
+        ],
+        "active_complete": true,
+        "lag_exceeds_t2": false,
+        "stationary": [
+          0.6989228564959964,
+          0.2635097004333164,
+          0.03756744307068732
+        ]
+      }
+    ],
+    "converged_lag_ps": 5.0,
+    "convergence": {
+      "rule": "95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 0 ps",
+      "min_lag_ps": 0.0,
+      "lag_exceeds_t2_ps": [],
+      "left_out_invalid_ci_or_incomplete_ps": [],
+      "rejected_by_accept_ps": []
+    },
+    "msm": {
+      "lag_ps": 100.0,
+      "counting": "core_start",
+      "estimator": "deeptime MaximumLikelihoodMSM(reversible=True) on the largest strongly connected count set",
+      "count_matrix": [
+        [
+          574875.0,
+          73022.0,
+          901.0
+        ],
+        [
+          44365.0,
+          102771.0,
+          121.0
+        ],
+        [
+          867.0,
+          92.0,
+          26502.0
+        ]
+      ],
+      "active_states": [
+        "C7eq/C5",
+        "alphaR",
+        "alphaL"
+      ],
+      "complete_state_set": true,
+      "never_visited_states": [],
+      "transition_matrix": [
+        [
+          0.8860616096068159,
+          0.11249647134831683,
+          0.0014419190448672033
+        ],
+        [
+          0.3015103826750344,
+          0.6979023070924152,
+          0.0005873102325503946
+        ],
+        [
+          0.030315203372231453,
+          0.004607059316651158,
+          0.9650777373111175
+        ]
+      ],
+      "transition_matrix_ci95_lo": [
+        [
+          0.8796648724096652,
+          0.10617954169099642,
+          0.0007522012853874688
+        ],
+        [
+          0.29098446967301006,
+          0.6882289505599938,
+          0.0001505699761868931
+        ],
+        [
+          0.020746700787619147,
+          0.0015575214170986129,
+          0.9367288944907669
+        ]
+      ],
+      "transition_matrix_ci95_hi": [
+        [
+          0.8926283996153472,
+          0.11886898369766855,
+          0.0021605327142587526
+        ],
+        [
+          0.3111711384055799,
+          0.7084138428722621,
+          0.0010033387083047175
+        ],
+        [
+          0.05729990300497268,
+          0.008037971608477624,
+          0.9762777650758053
+        ]
+      ],
+      "transition_matrix_row_normalised": [
+        [
+          0.8860616093144553,
+          0.11254966877209856,
+          0.0013887219134460958
+        ],
+        [
+          0.3012760004617777,
+          0.6979023068512872,
+          0.0008216926869350862
+        ],
+        [
+          0.03157204763118605,
+          0.0033502057463311607,
+          0.9650777466224828
+        ]
+      ],
+      "transition_matrix_row_normalised_ci95_lo": [
+        [
+          0.8796648721781948,
+          0.10619584202375067,
+          0.0007124455210882267
+        ],
+        [
+          0.29120432983032124,
+          0.6882289504098607,
+          0.0
+        ],
+        [
+          0.02092926172845483,
+          0.0,
+          0.9367289028780025
+        ]
+      ],
+      "transition_matrix_row_normalised_ci95_hi": [
+        [
+          0.8926283994202925,
+          0.11896055070432691,
+          0.0020425749008433553
+        ],
+        [
+          0.31138848802947816,
+          0.7084138431726257,
+          0.0017791643312823602
+        ],
+        [
+          0.0584286199654065,
+          0.008377295445633474,
+          0.9762777747991523
+        ]
+      ],
+      "row_normalised_n_boot_valid_per_row": [
+        200,
+        200,
+        200
+      ],
+      "row_normalised_ci_valid_per_row": [
+        true,
+        true,
+        true
+      ],
+      "note": "transition_matrix = reversible MLE (use for ITS / populations); transition_matrix_row_normalised = C_ij / sum_j C_ij (design-independent; 14b compares THIS)",
+      "stationary_population": {
+        "C7eq/C5": {
+          "value": 0.7038912531284508,
+          "ci95": [
+            0.681576425220142,
+            0.7258754569533553
+          ]
+        },
+        "alphaR": {
+          "value": 0.2626287078029818,
+          "ci95": [
+            0.2513314661384982,
+            0.2763810363356974
+          ]
+        },
+        "alphaL": {
+          "value": 0.033480039068567446,
+          "ci95": [
+            0.011405337145933444,
+            0.05626985839761657
+          ]
+        }
+      },
+      "timescales_ps": [
+        2718.199555609931,
+        186.61375631532465
+      ],
+      "n_boot_used": 200,
+      "n_boot_excluded_active_set_mismatch": 0,
+      "ci_valid": true,
+      "lag_source": "converged core-start t2 with a passing core-start CK (95% percentile CI of the paired bootstrap ratio t2(tau_i)/t2(tau_j) contains 1, or t2(tau_i) within 10% of t2(tau_j), for every larger lag tau_j (tau > t2 kept; invalid-CI lags left out); tau_i >= 10 ps; and the core-start CK at that lag passes (pass = true))"
+    },
+    "msm_null_reason": null,
+    "ck_test": {
+      "counting": "core_start",
+      "tau_ps": 100.0,
+      "t2_ps": 2718.199555609931,
+      "k": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        9,
+        13,
+        18,
+        27,
+        38,
+        55
+      ],
+      "horizon_ps": 5500.0,
+      "horizon_target_ps": 5436.399111219862,
+      "horizon_reaches_t2": true,
+      "horizon_note": null,
+      "rows": [
+        {
+          "k": 1,
+          "lag_ps": 100.0,
+          "predicted_stay": [
+            0.8860616096068159,
+            0.6979023070924152,
+            0.9650777373111175
+          ],
+          "estimated_stay": [
+            0.8860616096068159,
+            0.6979023070924152,
+            0.9650777373111175
+          ],
+          "estimated_ci95_lo": [
+            0.8796648724096652,
+            0.6882289505599938,
+            0.9367288944907669
+          ],
+          "estimated_ci95_hi": [
+            0.8926283996153472,
+            0.7084138428722621,
+            0.9762777650758053
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 2,
+          "lag_ps": 200.0,
+          "predicted_stay": [
+            0.819067742213935,
+            0.5209891901438164,
+            0.9314214568957163
+          ],
+          "estimated_stay": [
+            0.815717609714511,
+            0.512745524953067,
+            0.9378391084474623
+          ],
+          "estimated_ci95_lo": [
+            0.8055037504353797,
+            0.4995347445465715,
+            0.8793605070582243
+          ],
+          "estimated_ci95_hi": [
+            0.8258058053751361,
+            0.5260882432114908,
+            0.9653634012408695
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 3,
+          "lag_ps": 300.0,
+          "predicted_stay": [
+            0.7795556460761229,
+            0.41733430432020563,
+            0.898983534752513
+          ],
+          "estimated_stay": [
+            0.7780112415182732,
+            0.4130582697355345,
+            0.9085976390888173
+          ],
+          "estimated_ci95_lo": [
+            0.7656201387800522,
+            0.3964320898816446,
+            0.8206775109389318
+          ],
+          "estimated_ci95_hi": [
+            0.7896133173375995,
+            0.43248429996131765,
+            0.947859011248641
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 4,
+          "lag_ps": 400.0,
+          "predicted_stay": [
+            0.7561360348688698,
+            0.35655213586231355,
+            0.8677188536220353
+          ],
+          "estimated_stay": [
+            0.7572526998906931,
+            0.359750577038303,
+            0.8771712530566317
+          ],
+          "estimated_ci95_lo": [
+            0.7441612211045657,
+            0.3382147163865246,
+            0.7533075634217142
+          ],
+          "estimated_ci95_hi": [
+            0.7691055280353093,
+            0.3797192314361156,
+            0.9266780787560331
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 6,
+          "lag_ps": 600.0,
+          "predicted_stay": [
+            0.7336788279135193,
+            0.299859353499338,
+            0.8085389285030146
+          ],
+          "estimated_stay": [
+            0.731097912106682,
+            0.2918552036965759,
+            0.8158843383387605
+          ],
+          "estimated_ci95_lo": [
+            0.717920542897396,
+            0.26804042056050875,
+            0.6433336788170715
+          ],
+          "estimated_ci95_hi": [
+            0.7413006009413823,
+            0.31414506903182926,
+            0.8867349849688169
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 9,
+          "lag_ps": 900.0,
+          "predicted_stay": [
+            0.7229581444919618,
+            0.27566983742024426,
+            0.7275485470814598
+          ],
+          "estimated_stay": [
+            0.7190027690796743,
+            0.26628531648421083,
+            0.7466953074708821
+          ],
+          "estimated_ci95_lo": [
+            0.704649913129954,
+            0.24245348423084118,
+            0.5682153970861381
+          ],
+          "estimated_ci95_hi": [
+            0.7314380898989704,
+            0.2955165588975319,
+            0.8407013452717869
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 13,
+          "lag_ps": 1300.0,
+          "predicted_stay": [
+            0.7187132592315923,
+            0.26952089811276664,
+            0.6325714238272987
+          ],
+          "estimated_stay": [
+            0.7121605620833544,
+            0.25415115610238215,
+            0.6693856692931057
+          ],
+          "estimated_ci95_lo": [
+            0.6952165617524575,
+            0.23319057796391843,
+            0.46157737962530565
+          ],
+          "estimated_ci95_hi": [
+            0.725785558676146,
+            0.27315023354936957,
+            0.771864165420359
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 18,
+          "lag_ps": 1800.0,
+          "predicted_stay": [
+            0.7160266068804667,
+            0.267839188267289,
+            0.5319128604516149
+          ],
+          "estimated_stay": [
+            0.7098703198984821,
+            0.26370857569375905,
+            0.5741961287076276
+          ],
+          "estimated_ci95_lo": [
+            0.6965306395135733,
+            0.24831353196023428,
+            0.3115063980679964
+          ],
+          "estimated_ci95_hi": [
+            0.7297354647610013,
+            0.2797610214838661,
+            0.6869562391386447
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 27,
+          "lag_ps": 2700.0,
+          "predicted_stay": [
+            0.7125935155992386,
+            0.26633709977422565,
+            0.3914207271722957
+          ],
+          "estimated_stay": [
+            0.7104821934142581,
+            0.27527847401782785,
+            0.40668584328995633
+          ],
+          "estimated_ci95_lo": [
+            0.6939530376421513,
+            0.251728425735331,
+            0.15892326589442599
+          ],
+          "estimated_ci95_hi": [
+            0.7316699335152463,
+            0.29898832673569953,
+            0.5513104580944862
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 38,
+          "lag_ps": 3800.0,
+          "predicted_stay": [
+            0.7096972258043182,
+            0.26510266017667067,
+            0.272294673743617
+          ],
+          "estimated_stay": [
+            0.6982142168092759,
+            0.26364743744020075,
+            0.2317104245611463
+          ],
+          "estimated_ci95_lo": [
+            0.6748910307366371,
+            0.24092571945516753,
+            0.0
+          ],
+          "estimated_ci95_hi": [
+            0.7223501546716667,
+            0.2845044863468054,
+            0.3867534050125344
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        },
+        {
+          "k": 55,
+          "lag_ps": 5500.0,
+          "predicted_stay": [
+            0.7069976797777909,
+            0.26395237040222264,
+            0.1612553944519963
+          ],
+          "estimated_stay": [
+            0.6932511112022922,
+            0.2500468360114514,
+            0.09562652444112432
+          ],
+          "estimated_ci95_lo": [
+            0.6651907201125804,
+            0.22311502297675284,
+            0.0
+          ],
+          "estimated_ci95_hi": [
+            0.7219171266908017,
+            0.27472243205779356,
+            0.24418471855945223
+          ],
+          "within_ci": [
+            true,
+            true,
+            true
+          ],
+          "n_boot_used": 200,
+          "n_boot_excluded_active_set_mismatch": 0,
+          "ci_valid": true
+        }
+      ],
+      "pass": true,
+      "criterion": "diag(T(tau)^k) inside [2.5,97.5]% bootstrap interval of diag(T_est(k tau)) +/- 0.01, k geometric up to max(5, ceil(2 t2 / tau))"
+    },
+    "ck_null_reason": null
+  },
+  "contract_14b": {
+    "compare_against": "core_start.msm.transition_matrix_row_normalised (with its CIs) at shoot_lag_ps; the reversible transition_matrix is for ITS/populations only",
+    "shoot_lag_ps": 100.0,
+    "lag_grid_ps": [
+      1.0,
+      2.0,
+      5.0,
+      10.0,
+      20.0,
+      50.0,
+      100.0,
+      200.0,
+      500.0,
+      1000.0,
+      2000.0
+    ],
+    "requested_lags_ps": [
+      1.0,
+      2.0,
+      5.0,
+      10.0,
+      20.0,
+      50.0,
+      100.0,
+      200.0,
+      500.0,
+      1000.0,
+      2000.0
+    ],
+    "lag_grid_matches_contract": true,
+    "lag_grid_rule": "14b fixes tau on the contract grid ala2_common.SHOOT_LAG_GRID_PS (ruling R40); a shoot_lag_ps chosen on any other grid is diagnostic only",
+    "obs_interval_ps": 1.0,
+    "labels": "ala2_common.label_shot(phi, psi, start_label, interval_ps=OBS_INTERVAL_PS)",
+    "start_frames": "raw core label >= 0 (C.core_labels)",
+    "estimator": "compare ROW-NORMALISED T_ij = C_ij / sum_j C_ij (design-independent). The reversible MLE (deeptime MaximumLikelihoodMSM(reversible=True) on the largest strongly connected count set) couples rows through detailed balance, so with 3 states it depends on the per-state number of shots (3.5-6 % on alphaL elements); use it for ITS only",
+    "propagator": "LangevinMiddle, gamma = 0.1 / ps, 300 K, dt = 2 fs, fixed box (as ref_long.py)"
+  },
+  "deeptime_version": "0.4.5",
+  "wall_s": 29.89400839805603
+}

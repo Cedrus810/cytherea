@@ -1,0 +1,48 @@
+{
+ "passed": true,
+ "reasons": [],
+ "fd_max_rel_err": 0.00016814426849545133,
+ "fd_noise_rel": 0.002635313727954192,
+ "repeat_bitwise": false,
+ "tolerances": {
+  "fd_rtol": 0.005,
+  "inv_rtol": 0.0001,
+  "nve_rtol": 0.01,
+  "repeat_rtol": 0.001
+ },
+ "fd_max_atom_rel_err": 0.000337846690526382,
+ "fd_noise_floor_rel": 0.00026721170841235856,
+ "repeat_max_rel_err": 0.00030151473237281643,
+ "fd_skipped_cutoff": 58,
+ "fd_cutoffs": [
+  0.9
+ ],
+ "precision": "mixed",
+ "mode": "sampled",
+ "n_probes": 5,
+ "n_fd_coords": 470,
+ "solute_atoms": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21
+ ]
+}

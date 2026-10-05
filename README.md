@@ -79,6 +79,7 @@ barnase–barstar encounter-sampling pair.
 | `examples/` | runnable campaigns, from 1D toys to solvated peptides |
 | `docs/design/` | design document (VENUS96 → Aβ42, v2 authoritative) |
 | `docs/reports/` | acceptance-campaign reports (A0 toys, A1 alanine dipeptide, A3 encounter pilot) and review handoffs |
+| `results/` | small machine-readable artifacts (analysis JSONs) backing `docs/reports/` |
 | `docs/STATUS.md` | living status and handoff notes |
 | `CHANGELOG.md` | what changed, when |
 

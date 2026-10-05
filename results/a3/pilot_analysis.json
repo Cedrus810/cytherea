@@ -1,0 +1,58 @@
+{
+ "n_shots": 30,
+ "b_nm": 5.0,
+ "q1_nm": 10.0,
+ "q2_nm": 15.0,
+ "q2": {
+  "beta": 0.0,
+  "beta_ci": [
+   0.0,
+   0.10239382809160794
+  ],
+  "beta_inf": 0.0,
+  "beta_inf_ci": [
+   0.0,
+   0.14611034344295978
+  ],
+  "n_reaction": 0,
+  "n_escape": 23,
+  "n_timeout": 7,
+  "n_nonfinite": 0,
+  "valid": false
+ },
+ "q1": {
+  "beta": 0.0,
+  "beta_ci": [
+   0.0,
+   0.09838760438586978
+  ],
+  "beta_inf": 0.0,
+  "beta_inf_ci": [
+   0.0,
+   0.17914915279999039
+  ],
+  "n_reaction": 0,
+  "n_escape": 24,
+  "n_timeout": 6,
+  "n_nonfinite": 0,
+  "valid": false
+ },
+ "valid": false,
+ "beta_inf_q2_minus_q1": 0.0,
+ "diff_ci95": [
+  -0.0226524805076393,
+  0.13701155723253164
+ ],
+ "diff_ci95_uniform_prior": [
+  -0.02256541470974244,
+  0.17567812670260438
+ ],
+ "diff_ci_method": "equal-tailed 95 % Bayesian credible interval; Jeffreys Dirichlet priors on the q1 outcome and on the continuation of the q1 escapes to q2 (impossible pairs refused); diff_ci95_uniform_prior: the same with uniform priors (prior sensitivity)",
+ "diff_ci_note": "fewer than 5 reactions or escapes at one q: the interval is dominated by the prior",
+ "stop_time_ps": {
+  "median": 7419.0,
+  "mean": 17306.466666666667,
+  "p90": 50000.0,
+  "total_ns": 519.194
+ }
+}

@@ -1,0 +1,168 @@
+{
+ "source": "runs/a3/pilot.sqlite (30 shots, stage pilot), offline replay of the stored r(t) every 1 ps",
+ "b_nm": 5.0,
+ "t_max_ps": 50000.0,
+ "criterion": "reaction = r <= r_c held for tau_p (BSurface + spec_region)",
+ "results": [
+  {
+   "r_c_nm": 3.0,
+   "tau_p_ps": 200.0,
+   "q15": {
+    "n_reaction": 6,
+    "n_escape": 23,
+    "n_timeout": 1,
+    "beta": 0.20689655172413793,
+    "beta_ci": [
+     0.0912854848616703,
+     0.37767933172280205
+    ],
+    "beta_inf": 0.28125,
+    "beta_inf_ci": [
+     0.13095125298166804,
+     0.4765310359776049
+    ],
+    "valid": true,
+    "stop_ps_median": 6955.0,
+    "stop_ps_mean": 8505.466666666667
+   },
+   "q10": {
+    "n_reaction": 5,
+    "n_escape": 24,
+    "n_timeout": 1,
+    "beta": 0.1724137931034483,
+    "beta_ci": [
+     0.06898530250310154,
+     0.3374160865009514
+    ],
+    "beta_inf": 0.29411764705882354,
+    "beta_inf_ci": [
+     0.12906688677864472,
+     0.5045790758861362
+    ],
+    "valid": true,
+    "stop_ps_median": 1725.5,
+    "stop_ps_mean": 3950.6
+   }
+  },
+  {
+   "r_c_nm": 3.0,
+   "tau_p_ps": 1000.0,
+   "q15": {
+    "n_reaction": 6,
+    "n_escape": 23,
+    "n_timeout": 1,
+    "beta": 0.20689655172413793,
+    "beta_ci": [
+     0.0912854848616703,
+     0.37767933172280205
+    ],
+    "beta_inf": 0.28125,
+    "beta_inf_ci": [
+     0.13095125298166804,
+     0.4765310359776049
+    ],
+    "valid": true,
+    "stop_ps_median": 6955.0,
+    "stop_ps_mean": 8536.5
+   },
+   "q10": {
+    "n_reaction": 5,
+    "n_escape": 24,
+    "n_timeout": 1,
+    "beta": 0.1724137931034483,
+    "beta_ci": [
+     0.06898530250310154,
+     0.3374160865009514
+    ],
+    "beta_inf": 0.29411764705882354,
+    "beta_inf_ci": [
+     0.12906688677864472,
+     0.5045790758861362
+    ],
+    "valid": true,
+    "stop_ps_median": 1761.5,
+    "stop_ps_mean": 3981.633333333333
+   }
+  },
+  {
+   "r_c_nm": 3.5,
+   "tau_p_ps": 200.0,
+   "q15": {
+    "n_reaction": 7,
+    "n_escape": 23,
+    "n_timeout": 0,
+    "beta": 0.23333333333333334,
+    "beta_ci": [
+     0.11092090715825262,
+     0.4043999127631018
+    ],
+    "beta_inf": 0.31343283582089554,
+    "beta_inf_ci": [
+     0.1576386497221855,
+     0.5045748553929673
+    ],
+    "valid": true,
+    "stop_ps_median": 6127.0,
+    "stop_ps_mean": 6267.7
+   },
+   "q10": {
+    "n_reaction": 6,
+    "n_escape": 24,
+    "n_timeout": 0,
+    "beta": 0.2,
+    "beta_ci": [
+     0.08806737551990587,
+     0.36661313384122307
+    ],
+    "beta_inf": 0.33333333333333337,
+    "beta_inf_ci": [
+     0.1618785334461941,
+     0.5365280411300616
+    ],
+    "valid": true,
+    "stop_ps_median": 1443.5,
+    "stop_ps_mean": 1846.8
+   }
+  },
+  {
+   "r_c_nm": 3.5,
+   "tau_p_ps": 1000.0,
+   "q15": {
+    "n_reaction": 7,
+    "n_escape": 23,
+    "n_timeout": 0,
+    "beta": 0.23333333333333334,
+    "beta_ci": [
+     0.11092090715825262,
+     0.4043999127631018
+    ],
+    "beta_inf": 0.31343283582089554,
+    "beta_inf_ci": [
+     0.1576386497221855,
+     0.5045748553929673
+    ],
+    "valid": true,
+    "stop_ps_median": 6264.5,
+    "stop_ps_mean": 6580.433333333333
+   },
+   "q10": {
+    "n_reaction": 6,
+    "n_escape": 24,
+    "n_timeout": 0,
+    "beta": 0.2,
+    "beta_ci": [
+     0.08806737551990587,
+     0.36661313384122307
+    ],
+    "beta_inf": 0.33333333333333337,
+    "beta_inf_ci": [
+     0.1618785334461941,
+     0.5365280411300616
+    ],
+    "valid": true,
+    "stop_ps_median": 1545.5,
+    "stop_ps_mean": 2159.5333333333333
+   }
+  }
+ ]
+}

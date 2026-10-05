@@ -49,6 +49,7 @@ cytherea run examples/toy_doublewell/config.yaml
 | `examples/` | 可运行算例,从 1D toy 到显式溶剂多肽 |
 | `docs/design/` | 设计文档(VENUS96 → Aβ42,v2 为准) |
 | `docs/reports/` | 验收报告(A0 toy、A1 丙氨酸二肽、A3 encounter pilot)与审查交接 |
+| `results/` | 支撑 `docs/reports/` 的小型机器可读产物(分析 JSON 等) |
 | `docs/STATUS.md` | 活页状态与交接记录 |
 | `CHANGELOG.md` | 变更日志 |
 

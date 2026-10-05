@@ -1,0 +1,58 @@
+{
+ "mixed": {
+  "repeat_probe0": {
+   "E": [
+    -40306.04546326105,
+    -40306.04536314696,
+    -40306.04536314696
+   ],
+   "max_abs_dF": 0.07058775424957275,
+   "max_abs_F": 2879.65760281682
+  },
+  "passed": false,
+  "reasons": [
+   "fd: fd_max_rel_err=1.654e-02 > fd_rtol=5.0e-03",
+   "fd_atom: fd_max_atom_rel_err=8.003e-02 > fd_rtol=5.0e-03",
+   "repeat: energy_forces is not bitwise repeatable (repeat_max_rel_err=4.249e-06; pass repeat_rtol>0 to declare a tolerance)"
+  ],
+  "fd_max_rel_err": 0.016537088082217554,
+  "fd_raw_rel_err": 0.030793897009702618,
+  "fd_noise_rel": 0.030599629144767583,
+  "fd_max_atom_rel_err": 0.08002850518304513,
+  "repeat_max_rel_err": 4.249469079376149e-06,
+  "force_scale": 3320.3058410054073,
+  "tolerances": {
+   "fd_rtol": 0.005,
+   "inv_rtol": 0.0001,
+   "nve_rtol": 0.01
+  }
+ },
+ "double": {
+  "repeat_probe0": {
+   "E": [
+    -40306.04762949556,
+    -40306.04762949556,
+    -40306.04762949556
+   ],
+   "max_abs_dF": 0.0,
+   "max_abs_F": 2879.7417276145425
+  },
+  "passed": false,
+  "reasons": [
+   "fd: fd_max_rel_err=1.686e-02 > fd_rtol=1.0e-04",
+   "fd_atom: fd_max_atom_rel_err=8.158e-02 > fd_rtol=1.0e-04",
+   "repeat: energy_forces is not bitwise repeatable (repeat_max_rel_err=7.012e-10; pass repeat_rtol>0 to declare a tolerance)"
+  ],
+  "fd_max_rel_err": 0.016858294825179816,
+  "fd_raw_rel_err": 0.030671599597775448,
+  "fd_noise_rel": 0.030671626664402277,
+  "fd_max_atom_rel_err": 0.08158301729463066,
+  "repeat_max_rel_err": 7.012315655451837e-10,
+  "force_scale": 3320.310366702499,
+  "tolerances": {
+   "fd_rtol": 0.0001,
+   "inv_rtol": 1e-10,
+   "nve_rtol": 0.001
+  }
+ }
+}
