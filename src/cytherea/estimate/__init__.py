@@ -3,7 +3,7 @@
 from cytherea.estimate.association import KonEstimate, estimate_kon, nam_beta_inf
 from cytherea.estimate.committor import CommittorEstimate, estimate_committor
 from cytherea.estimate.decompose import Decomposition, decompose, hierarchical_bootstrap
-from cytherea.estimate.msm import CKResult, TEstimate, ck_test, estimate_T
+from cytherea.estimate.msm import CKResult, TEstimate, ck_test, ck_test_shots, estimate_T
 from cytherea.estimate.records import records_to_groups, records_to_transitions, shot_weights
 
 __all__ = [
@@ -13,6 +13,7 @@ __all__ = [
     "KonEstimate",
     "TEstimate",
     "ck_test",
+    "ck_test_shots",
     "decompose",
     "estimate_T",
     "estimate_committor",

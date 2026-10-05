@@ -1543,3 +1543,133 @@ def test_records_to_transitions_keeps_caller_weights_with_their_records():
         assert stay == pytest.approx(0.9)
     with pytest.raises(ValueError, match="one entry per record"):
         records_to_transitions(recs, {"A": 0, "B": 1}, weights=[1.0])
+
+
+# ------------------------------------------------- CK from multi-lag fixed-lag shots
+
+def _multilag_shots(P, n_frames, shots_per_frame, ks, rng, lump=None, start_pick=None):
+    """Shots started at t = 0 from every state of the observed chain, the state
+    recorded at each k of `ks`. With `lump`, P is a hidden chain observed
+    through `lump` and each frame is a hidden state drawn uniformly from the
+    lump (its equilibrium law here); all shots of a frame share it."""
+    n_hidden = P.shape[0]
+    obs_of = np.arange(n_hidden) if lump is None else lump
+    n_obs = int(obs_of.max()) + 1
+    cum = np.cumsum(P, axis=1)
+    start, ends, frames = [], [], []
+    fid = 0
+    for s in range(n_obs):
+        members = np.flatnonzero(obs_of == s)
+        for _ in range(n_frames):
+            h0 = rng.choice(members)
+            for _ in range(shots_per_frame):
+                x, row, t = h0, [], 0
+                for k in sorted(ks):
+                    while t < k:
+                        x = int((rng.random() > cum[x]).sum())
+                        t += 1
+                    row.append(obs_of[x])
+                start.append(s)
+                ends.append([row[sorted(ks).index(k)] for k in ks])
+                frames.append(fid)
+            fid += 1
+    return np.array(start), np.array(ends, dtype=np.int64), np.array(frames)
+
+
+def test_ck_shots_markov_chain_passes_and_lumped_hidden_chain_fails():
+    from cytherea.estimate import ck_test_shots
+
+    ks = (1, 2, 5, 10, 20)
+    rng = np.random.Generator(np.random.PCG64(41))
+    s, e, f = _multilag_shots(P3, 50, 10, ks, rng)
+    res = ck_test_shots(s, e, ks, 3, 300, rng, frame_ids=f)
+    assert res.passed and res.active_set.tolist() == [0, 1, 2] and res.n_boot_degenerate == 0
+    s, e, f = _multilag_shots(P_HIDDEN, 50, 10, ks, rng, lump=LUMP)
+    assert not ck_test_shots(s, e, ks, 2, 300, rng, frame_ids=f).passed
+    assert not ck_test_shots(s, e, ks, 2, 300, rng).passed
+
+
+def test_ck_shots_size_over_seeds():
+    """A Markov chain passes in >= 85 % of 30 independent campaigns (nominal 95 %)."""
+    from cytherea.estimate import ck_test_shots
+
+    ks = (1, 2, 5, 10)
+    passed = 0
+    for seed in range(30):
+        rng = np.random.Generator(np.random.PCG64(1000 + seed))
+        s, e, f = _multilag_shots(P3, 20, 5, ks, rng)
+        passed += ck_test_shots(s, e, ks, 3, 200, rng, frame_ids=f).passed
+    assert passed >= 0.85 * 30, passed
+
+
+def test_ck_shots_depends_only_on_the_set_of_shots():
+    from cytherea.estimate import ck_test_shots
+
+    ks = (1, 3, 6)
+    s, e, f = _multilag_shots(P3, 10, 4, ks, np.random.Generator(np.random.PCG64(5)))
+    perm = np.random.Generator(np.random.PCG64(6)).permutation(s.size)
+    for fids in (None, f):
+        a = ck_test_shots(s, e, ks, 3, 100, np.random.Generator(np.random.PCG64(7)), frame_ids=fids)
+        b = ck_test_shots(s[perm], e[perm], ks, 3, 100, np.random.Generator(np.random.PCG64(7)),
+                          frame_ids=None if fids is None else fids[perm])
+        assert (a.passed, a.max_dev) == (b.passed, b.max_dev)
+
+
+def test_ck_shots_validates_its_input():
+    from cytherea.estimate import ck_test_shots
+
+    rng = np.random.Generator(np.random.PCG64(0))
+    s = np.array([0, 0, 1, 1])
+    e = np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+    ck_test_shots(s, e, (1, 2), 2, 10, rng)
+    with pytest.raises(ValueError, match="must contain 1"):
+        ck_test_shots(s, e, (2, 3), 2, 10, rng)
+    with pytest.raises(ValueError, match="shape"):
+        ck_test_shots(s, e[:, :1], (1, 2), 2, 10, rng)
+    with pytest.raises(ValueError, match="state 2"):
+        ck_test_shots(s, e, (1, 2), 3, 10, rng)
+    with pytest.raises(ValueError, match="outside"):
+        ck_test_shots(s, e + 1, (1, 2), 2, 10, rng)
+    with pytest.raises(ValueError, match="frame"):
+        ck_test_shots(s, e, (1, 2), 2, 10, rng, frame_ids=np.array([0, 1, 1, 2]))
+    with pytest.raises(ValueError, match="distinct"):
+        ck_test_shots(s, e, (1, 1), 2, 10, rng)
+
+
+def test_ck_shots_with_tau_only_shots():
+    """T(tau) from the long shots plus tau-only shots (A1 14.3, 2026-10-04): a
+    Markov chain still passes, the lumped chain still fails, and the extra
+    shots tighten T(tau) (the k = 1 deviation stays 0 by construction)."""
+    from cytherea.estimate import ck_test_shots
+
+    ks = (1, 2, 5, 10, 20)
+    rng = np.random.Generator(np.random.PCG64(43))
+    s, e, f = _multilag_shots(P3, 50, 4, ks, rng)
+    ts, te, tf = _multilag_shots(P3, 50, 6, (1,), rng)
+    res = ck_test_shots(s, e, ks, 3, 300, rng, frame_ids=f,
+                        tau_only={"start": ts, "end": te[:, 0], "frame_ids": tf})
+    assert res.passed
+    s, e, f = _multilag_shots(P_HIDDEN, 50, 4, ks, rng, lump=LUMP)
+    ts, te, tf = _multilag_shots(P_HIDDEN, 50, 6, (1,), rng, lump=LUMP)
+    assert not ck_test_shots(s, e, ks, 2, 300, rng, frame_ids=f,
+                             tau_only={"start": ts, "end": te[:, 0], "frame_ids": tf}).passed
+    with pytest.raises(ValueError, match="frame_ids"):
+        ck_test_shots(s, e, ks, 2, 10, rng, frame_ids=f, tau_only={"start": ts, "end": te[:, 0]})
+    with pytest.raises(ValueError, match="two start states"):
+        ck_test_shots(s, e, ks, 2, 10, rng, frame_ids=f,
+                      tau_only={"start": 1 - ts, "end": te[:, 0], "frame_ids": tf})
+
+
+def test_ck_shots_tau_only_size_over_seeds():
+    """With tau-only shots the test keeps its size: a Markov chain passes in >= 85 %."""
+    from cytherea.estimate import ck_test_shots
+
+    ks = (1, 2, 5, 10)
+    passed = 0
+    for seed in range(30):
+        rng = np.random.Generator(np.random.PCG64(3000 + seed))
+        s, e, f = _multilag_shots(P3, 20, 2, ks, rng)
+        ts, te, tf = _multilag_shots(P3, 20, 3, (1,), rng)
+        passed += ck_test_shots(s, e, ks, 3, 200, rng, frame_ids=f,
+                                tau_only={"start": ts, "end": te[:, 0], "frame_ids": tf}).passed
+    assert passed >= 0.85 * 30, passed

@@ -584,3 +584,134 @@ def ck_test(
     return CKResult(passed=bool(D <= np.percentile(D_boot, 95)), max_dev=D, active_set=active,
                     excluded_states=excluded, n_boot=n_boot,
                     n_boot_degenerate=int(degenerate.sum()), rows_missing=rows_missing)
+
+
+def ck_test_shots(
+    start_states: np.ndarray,
+    end_states_by_k: np.ndarray,
+    ks: Sequence[int],
+    n_states: int,
+    n_boot: int,
+    rng: np.random.Generator,
+    frame_ids: np.ndarray | None = None,
+    tau_only: dict | None = None,
+) -> CKResult:
+    """Chapman-Kolmogorov test T(k tau) ~ T(tau)^k from fixed-lag shots that
+    record their state at several multiples of tau (design 4.1, Task 14.3).
+
+    ``end_states_by_k[i, m]`` is the state of shot i at t = ``ks[m]`` tau;
+    ``ks`` are distinct integers >= 1 and must contain 1. Every T is the
+    row-normalised, unweighted estimate from the shots' t = 0 windows only
+    (for shots started inside cores: the core-start T(k tau)), so this tests
+    the shots' own Markovianity, not a comparison with a reference. Every
+    state of ``[0, n_states)`` needs shots (a state reached at k tau must
+    have its own row of T(tau)); a missing one raises ``ValueError`` naming
+    it. Shots that stopped non-finite carry no end state and must be left
+    out by the caller (and reported, contract K4).
+
+    Statistic and null distribution as in :func:`ck_test`:
+    D = max over k in ks and all ij of |T(tau)^k - T(k tau)|, and
+    D*_b = max_k,ij |(T*_b(tau)^k - T*_b(k tau)) - (T(tau)^k - T(k tau))|
+    with both terms re-estimated on the same bootstrap replicate. The
+    bootstrap is stratified by start state (the shooting design fixes the
+    number of shots per state); its unit is the frame when ``frame_ids`` is
+    given (every frame in one start state; all its shots drawn together),
+    else the shot. Passes iff D <= the 95th percentile of {D*_b}. Units are
+    put in a canonical order first, so the result depends only on the set
+    of shots (and their frame ids). Returns a :class:`CKResult` with all
+    states active and ``rows_missing`` empty (stratification keeps every row).
+
+    ``tau_only`` (optional): shots that ran only tau, as a dict with
+    ``start`` and ``end`` (state at tau) and, when ``frame_ids`` is given,
+    ``frame_ids`` (required then). T(tau) is then estimated from the long
+    shots' first tau together with these shots; T(k tau) for k >= 2 from the
+    long shots only (the k = 1 deviation is 0 by construction). A frame
+    carries its shots of both kinds through the bootstrap, so a frame id must
+    keep one start state across both. Without ``frame_ids`` every tau-only
+    shot is its own unit.
+    """
+    start = _check_states(start_states, n_states, "start_states")
+    ends = np.asarray(end_states_by_k)
+    ks = [int(k) for k in ks]
+    if not ks or min(ks) < 1 or len(set(ks)) != len(ks):
+        raise ValueError("ks must be distinct integers >= 1")
+    if 1 not in ks:
+        raise ValueError("ks must contain 1 (T(tau) is estimated from the k = 1 column)")
+    if ends.shape != (start.size, len(ks)):
+        raise ValueError(f"end_states_by_k must have shape (n_shots, len(ks)) = ({start.size}, {len(ks)}), "
+                         f"got {ends.shape}")
+    ends = _check_states(ends.reshape(-1), n_states, "end_states_by_k").reshape(ends.shape)
+    if n_boot < 1:
+        raise ValueError("n_boot must be >= 1")
+    n = n_states
+    if tau_only is not None:
+        t_start = _check_states(tau_only["start"], n_states, "tau_only['start']")
+        t_end = _check_states(tau_only["end"], n_states, "tau_only['end']")
+        if t_end.shape != t_start.shape:
+            raise ValueError("tau_only['end'] must have one entry per tau-only shot")
+        if frame_ids is not None and "frame_ids" not in tau_only:
+            raise ValueError("tau_only needs 'frame_ids' when frame_ids is given (frames are the bootstrap unit)")
+    else:
+        t_start = t_end = np.zeros(0, dtype=np.int64)
+    counts_per_state = np.bincount(np.concatenate([start, t_start]), minlength=n)
+    if (counts_per_state == 0).any():
+        raise ValueError(f"no shots start in state {int(np.flatnonzero(counts_per_state == 0)[0])}; "
+                         "every state needs its own row of T(tau)")
+
+    if frame_ids is None:
+        unit = np.lexsort((*ends.T[::-1], start))  # canonical shot order
+        unit_of_shot = np.empty(start.size, dtype=np.int64)
+        unit_of_shot[unit] = np.arange(start.size)
+        t_unit = np.lexsort((t_end, t_start))
+        unit_of_tau = np.empty(t_start.size, dtype=np.int64)
+        unit_of_tau[t_unit] = start.size + np.arange(t_start.size)
+        unit_state = np.concatenate([start[unit], t_start[t_unit]])
+    else:
+        fids = np.asarray(frame_ids)
+        if fids.shape != start.shape:
+            raise ValueError("frame_ids must have one entry per shot")
+        t_fids = np.asarray(tau_only["frame_ids"]) if tau_only is not None else fids[:0]
+        if t_fids.shape != t_start.shape:
+            raise ValueError("tau_only['frame_ids'] must have one entry per tau-only shot")
+        uniq, inv = np.unique(np.concatenate([fids, t_fids]), return_inverse=True)
+        unit_state = np.full(uniq.size, -1)
+        for u, s in zip(inv, np.concatenate([start, t_start])):
+            if unit_state[u] not in (-1, s):
+                raise ValueError(f"frame {uniq[u]!r} has shots from two start states")
+            unit_state[u] = s
+        order = np.lexsort((np.arange(uniq.size), unit_state))
+        rank = np.empty(uniq.size, dtype=np.int64)
+        rank[order] = np.arange(uniq.size)
+        inv, unit_state = rank[inv], unit_state[order]
+        unit_of_shot, unit_of_tau = inv[: start.size], inv[start.size:]
+    n_units = unit_state.size
+
+    # per-unit counts at every k: (len(ks), n_units, n*n); T(tau) also gets the tau-only shots
+    C_u = np.zeros((len(ks), n_units, n * n))
+    for m in range(len(ks)):
+        np.add.at(C_u[m], (unit_of_shot, start * n + ends[:, m]), 1.0)
+    i1 = ks.index(1)
+    np.add.at(C_u[i1], (unit_of_tau, t_start * n + t_end), 1.0)
+
+    def stat(C: np.ndarray) -> np.ndarray:
+        """(..., len(ks), n, n) counts -> T(tau)^k - T(k tau) per k."""
+        T = _row_normalize(C)
+        T1 = T[..., i1, :, :]
+        return np.stack([np.linalg.matrix_power(T1, k) - T[..., m, :, :] for m, k in enumerate(ks)], axis=-3)
+
+    dev = stat(C_u.sum(axis=1).reshape(len(ks), n, n))
+    D = float(np.abs(dev).max())
+
+    by_state = [np.flatnonzero(unit_state == s) for s in range(n)]
+    D_boot = np.zeros(n_boot)
+    block = max(1, min(n_boot, _BLOCK_ELEMS // max(n_units, len(ks) * n * n)))
+    for b0 in range(0, n_boot, block):
+        b1 = min(n_boot, b0 + block)
+        M = np.zeros((b1 - b0, n_units))
+        for idx in by_state:
+            M[:, idx] = _multiplicities(rng, idx.size, b1 - b0)
+        Cb = np.einsum("bu,kuc->bkc", M, C_u).reshape(b1 - b0, len(ks), n, n)
+        D_boot[b0:b1] = np.abs(stat(Cb) - dev).max(axis=(1, 2, 3))
+    return CKResult(passed=bool(D <= np.percentile(D_boot, 95)), max_dev=D, active_set=np.arange(n),
+                    excluded_states=np.zeros(0, dtype=np.int64), n_boot=n_boot, n_boot_degenerate=0,
+                    rows_missing={})
