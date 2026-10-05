@@ -24,14 +24,18 @@ epithet of Aphrodite — Venus under another name.
   `energy_forces(x, box)`, observation every `dt_obs`, and `NaN` translated into a
   `NumericalInstabilityError` instead of silent corruption.
 - **PES consistency suite** — NVE total-energy drift, integrator invariants and
-  finite-difference force checks, in strict and sampled (stratified atom-group) modes.
+  finite-difference force checks with a cutoff-crossing guard (coordinates whose
+  stencil moves a pair across a nonbonded cutoff are skipped and reported), in
+  strict and sampled (stratified atom-group) modes.
 - **Ensemble initial conditions** — `EnsembleFramePool` with structural validity gates
   (energy window, minimum interatomic distance, COM momentum, temperature
   degrees of freedom) and constraint projection.
 - **Estimators with calibrated uncertainty** — cluster-bootstrap transition matrices,
   state-fixed hierarchical bootstrap, committor and k_on with
-  n_eff = min(Korn–Graubard, Kish), and a global null-centred bootstrap
-  Chapman–Kolmogorov test that stays calibrated on sparse Markov chains.
+  n_eff = min(Korn–Graubard, Kish), a global null-centred bootstrap
+  Chapman–Kolmogorov test that stays calibrated on sparse Markov chains, and a
+  shot-based variant (`ck_test_shots`) that tests fixed-lag shooting data at
+  k·τ straight from the shots, τ-only shots included.
 - **In-house weighted ensemble** — `BinnedWE` with label constraints, weight-aware
   recycling, and exact offline replay of segment lineages.
 - **Milestone absorbing networks** — core-set milestoning, absorption probabilities,
@@ -64,7 +68,7 @@ cytherea run examples/toy_doublewell/config.yaml
 ```
 
 `examples/` also contains weighted-ensemble and milestone-network toys, the
-alanine-dipeptide explicit-solvent reference pipeline (OpenMM), and a
+alanine-dipeptide explicit-solvent reference and shooting pipelines (OpenMM), and a
 barnase–barstar encounter-sampling pair.
 
 ## Repository map
@@ -74,6 +78,7 @@ barnase–barstar encounter-sampling pair.
 | `src/cytherea/` | the library: keys, store, backends, engine, ic, estimate, network, resample, config, cli |
 | `examples/` | runnable campaigns, from 1D toys to solvated peptides |
 | `docs/design/` | design document (VENUS96 → Aβ42, v2 authoritative) |
+| `docs/reports/` | acceptance-campaign reports (A0 toys, A1 alanine dipeptide, A3 encounter pilot) and review handoffs |
 | `docs/STATUS.md` | living status and handoff notes |
 | `CHANGELOG.md` | what changed, when |
 
