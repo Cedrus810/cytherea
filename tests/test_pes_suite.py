@@ -909,7 +909,8 @@ def test_explicit_tolerances_override_row():
         _make_backend(), _probes_2d(n=2), mode="sampled", precision="single",
         fd_rtol=1e-6, inv_rtol=1e-7, nve_rtol=1e-8,
     )
-    assert r.tolerances == {"fd_rtol": 1e-6, "inv_rtol": 1e-7, "nve_rtol": 1e-8}
+    assert r.tolerances == {"fd_rtol": 1e-6, "inv_rtol": 1e-7, "nve_rtol": 1e-8,
+                            "repeat_rtol": DEFAULT_TOLERANCES["single"]["repeat_rtol"]}
 
 
 def test_rtol_is_a_deprecated_alias_for_fd_rtol():
@@ -1194,3 +1195,164 @@ def test_l7_i2_too_much_noise_is_fd_unresolved_not_a_pass():
     probes = [rng.normal(size=(n, 3)) for _ in range(3)]
     rep = pes_consistency_suite(_Noisy(n, 1e-7, 0.0), probes, mode="sampled", n_fd_atoms=n, fd_step=1e-5)
     assert not rep.passed and any(r.startswith("fd_unresolved") for r in rep.reasons)
+
+
+# ---------------------------------------------------------------------------
+# Cutoff crossings (A1 14.1, 2026-10-04): a plain cutoff makes E jump at r_c,
+# so a finite difference whose stencil moves a pair across r_c measures the
+# jump, not the force. Backends that declare their cutoffs
+# (`energy_cutoffs()`) get those coordinates skipped and counted.
+# ---------------------------------------------------------------------------
+
+class _TruncatedPairBackend:
+    """E = sum over pairs with r < rc of eps (sig/r)^6 -- unshifted, so E jumps
+    by eps (sig/rc)^6 where a pair crosses rc. Optional orthorhombic box (min
+    image). ``declare`` toggles the energy_cutoffs() hook; ``bad_atom`` scales
+    that atom's force by 1.05 (a defect the FD check must still see)."""
+
+    kind = "analytic"
+    gpu_resident = False
+
+    def __init__(self, rc=0.9, box=None, declare=True, bad_atom=None, eps=100.0, sig=0.3, precision="mixed"):
+        self.rc, self.box, self.eps, self.sig = rc, box, eps, sig
+        self.bad_atom, self.precision = bad_atom, precision
+        if declare:
+            self.energy_cutoffs = lambda: {"cutoffs_nm": [rc],
+                                           "box_lengths_nm": None if box is None else list(box)}
+
+    def _d(self, x):
+        d = x[None, :, :] - x[:, None, :]
+        if self.box is not None:
+            L = np.asarray(self.box)
+            d -= np.round(d / L) * L
+        return d
+
+    def energy_forces(self, x, box=None):
+        x = np.asarray(x, float)
+        d = self._d(x)
+        r = np.linalg.norm(d, axis=-1)
+        n = x.shape[0]
+        iu = np.triu_indices(n, 1)
+        on = np.zeros((n, n), bool)
+        on[iu] = r[iu] < self.rc
+        E = float(np.sum(self.eps * (self.sig / r[on]) ** 6))
+        F = np.zeros_like(x)
+        for i, j in zip(*np.nonzero(on)):
+            g = 6 * self.eps * self.sig**6 / r[i, j] ** 8 * d[i, j]  # -dE/dx_j along d = x_j - x_i
+            F[j] += g
+            F[i] -= g
+        if self.bad_atom is not None:
+            F[self.bad_atom] *= 1.05
+        return E, F
+
+    def build(self, s, cfg, rng_key):
+        raise NotImplementedError
+
+    def effective_config(self, cfg=None):
+        return {"backend": "fake_truncated_pair", "precision": self.precision}
+
+    def provenance(self, cfg=None):
+        return {"kind": self.kind}
+
+
+def _pair_probe(gap, h=1e-4):
+    """6 atoms: 0-1 at rc + gap*h (inside the FD stencil when |gap| < 1), the
+    rest well inside the cutoff of their neighbours and far from rc."""
+    x = np.array([[0.0, 0.0, 0.0], [0.9 + gap * h, 0.0, 0.0], [0.35, 0.33, 0.0],
+                  [0.45, -0.32, 0.05], [0.3, 0.0, 0.36], [0.6, 0.05, -0.34]])
+    return x
+
+
+def _two_crossing_probe(h=1e-4):
+    """Atom 0 moving along x: pair 0-1 enters the cutoff at +0.3 h (both FD
+    stencils), pair 0-2 leaves it at -~0.84 h (only the h stencil), so
+    F_fd(h) and F_fd(h/2) carry the same jump error and the per-coordinate
+    FD allowance cannot absorb it -- as on the solvated A1 system."""
+    r2 = 0.9 - 0.7 * h
+    return np.array([[0.0, 0.0, 0.0], [0.9 + 0.3 * h, 0.0, 0.0], [np.sqrt(r2**2 - 0.25), 0.5, 0.0],
+                     [0.3, -0.35, 0.1], [0.25, 0.05, 0.4], [0.5, -0.1, -0.35]])
+
+
+def test_cutoff_crossing_fails_fd_without_a_declared_cutoff():
+    r = pes_consistency_suite(_TruncatedPairBackend(declare=False), [_two_crossing_probe()], mode="sampled")
+    assert not r.passed and any(s.startswith("fd") for s in r.reasons), r.reasons
+    assert r.fd_skipped_cutoff == 0
+    ok = pes_consistency_suite(_TruncatedPairBackend(), [_two_crossing_probe()], mode="sampled")
+    assert ok.passed, ok.reasons
+    assert ok.fd_skipped_cutoff >= 1
+
+
+def test_declared_cutoff_skips_crossing_coordinates_and_reports_them():
+    r = pes_consistency_suite(_TruncatedPairBackend(), [_pair_probe(0.3)], mode="sampled")
+    assert r.passed, r.reasons
+    assert r.fd_skipped_cutoff >= 1 and r.n_fd_coords == 18 - r.fd_skipped_cutoff
+    assert r.fd_cutoffs == [0.9]
+    # far from the cutoff nothing is skipped
+    far = _pair_probe(0.0)
+    far[1, 0] = 0.7
+    r2 = pes_consistency_suite(_TruncatedPairBackend(), [far], mode="sampled")
+    assert r2.passed and r2.fd_skipped_cutoff == 0 and r2.n_fd_coords == 18
+
+
+def test_declared_cutoff_still_catches_a_force_defect():
+    r = pes_consistency_suite(_TruncatedPairBackend(bad_atom=3), [_pair_probe(0.3)], mode="sampled")
+    assert not r.passed and any(s.startswith("fd") for s in r.reasons)
+
+
+def test_cutoff_crossing_through_a_periodic_image():
+    x = _pair_probe(0.0)
+    x[1] = [-0.9 - 0.3e-4 + 2.0, 0.0, 0.0]  # 0-1 at 1.1 nm directly, rc + 0.3 h through the image
+    r = pes_consistency_suite(_TruncatedPairBackend(box=(2.0, 2.0, 2.0)), [x], mode="sampled")
+    assert r.passed, r.reasons
+    assert r.fd_skipped_cutoff == 2  # atom 0 and atom 1, x only
+    nobox = pes_consistency_suite(_TruncatedPairBackend(), [x], mode="sampled")  # no image: 1.1 nm, no crossing
+    assert nobox.fd_skipped_cutoff == 0
+
+
+def test_every_coordinate_skipped_is_unresolved():
+    x = np.array([[0.0, 0.0, 0.0], [0.9 + 0.3e-4, 0.0, 0.0]])
+    x[1] = (0.9 + 0.3e-4) * np.ones(3) / np.sqrt(3.0)  # every component moves r
+    r = pes_consistency_suite(_TruncatedPairBackend(), [x], mode="sampled")
+    assert not r.passed
+    assert any(s.startswith("fd_unresolved") for s in r.reasons)
+    assert r.n_fd_coords == 0 and r.fd_skipped_cutoff == 6
+
+
+def test_cutoff_guard_needs_atom_rows():
+    class _Flat(_TruncatedPairBackend):
+        def energy_forces(self, x, box=None):
+            E, F = super().energy_forces(np.asarray(x).reshape(-1, 3))
+            return E, F.reshape(-1)
+
+    with pytest.raises(ValueError, match="n_atoms, 3"):
+        pes_consistency_suite(_Flat(), [_pair_probe(5.0).reshape(-1)], mode="sampled")
+
+
+class _JitterBackend(_TruncatedPairBackend):
+    """First evaluation at a position differs from later ones by `rel` of the
+    force scale (like OpenMM CUDA mixed reordering atoms after its first call)."""
+
+    def __init__(self, rel, **kw):
+        super().__init__(**kw)
+        self.rel, self._seen = rel, set()
+
+    def energy_forces(self, x, box=None):
+        E, F = super().energy_forces(x)
+        k = np.asarray(x).tobytes()
+        if k not in self._seen:
+            self._seen.add(k)
+            F = F + self.rel * np.max(np.abs(F))
+        return E, F
+
+
+def test_repeat_tolerance_defaults_follow_the_precision_row():
+    far = _pair_probe(0.0)
+    far[1, 0] = 0.7
+    r = pes_consistency_suite(_JitterBackend(3e-4), [far], mode="sampled", precision="mixed")
+    assert not r.repeat_bitwise and r.passed, r.reasons
+    assert r.tolerances["repeat_rtol"] == DEFAULT_TOLERANCES["mixed"]["repeat_rtol"]
+    strict0 = pes_consistency_suite(_JitterBackend(3e-4), [far], mode="sampled", precision="mixed", repeat_rtol=0.0)
+    assert not strict0.passed and any(s.startswith("repeat") for s in strict0.reasons)
+    big = pes_consistency_suite(_JitterBackend(5e-3), [far], mode="sampled", precision="mixed")
+    assert not big.passed and any(s.startswith("repeat") for s in big.reasons)
+    assert DEFAULT_TOLERANCES["double"]["repeat_rtol"] == 0.0

@@ -886,6 +886,29 @@ class OpenMMBackend:
 
     # -- single-point evaluation ---------------------------------------------
 
+    def energy_cutoffs(self) -> dict | None:
+        """The pair cutoffs (nm) of every force with a cutoff nonbonded method,
+        and the default box edge lengths (nm; None without PBC), for the PES
+        suite's cutoff-crossing guard (`cytherea.backends.pes_suite`). All
+        such cutoffs are listed, switched or not: skipping a few more FD
+        coordinates only costs power. None when no force has a cutoff."""
+        cutoffs = set()
+        for f in self.system.getForces():
+            if hasattr(f, "getNonbondedMethod") and hasattr(f, "getCutoffDistance"):
+                if f.getNonbondedMethod() != 0:  # NoCutoff is 0 for every nonbonded force class
+                    c = f.getCutoffDistance()
+                    cutoffs.add(float(c.value_in_unit(u.nanometer) if u.is_quantity(c) else c))
+        if not cutoffs:
+            return None
+        lengths = None
+        if self._periodic:
+            box = np.array([[v.value_in_unit(u.nanometer) for v in vec]
+                            for vec in self.system.getDefaultPeriodicBoxVectors()])
+            if np.any(box - np.diag(np.diag(box))):
+                raise ValueError("energy_cutoffs: the default box is triclinic; the guard needs an orthorhombic box")
+            lengths = np.diag(box).tolist()
+        return {"cutoffs_nm": sorted(cutoffs), "box_lengths_nm": lengths}
+
     def _ctx(self) -> openmm.Context:
         if self._energy_context is None:
             platform, props = _platform_and_properties(self.cfg)

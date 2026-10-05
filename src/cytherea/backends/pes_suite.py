@@ -41,16 +41,20 @@ analytic toys).
 Default tolerances (`DEFAULT_TOLERANCES`)
 =========================================
 
-========  =========  =========  =========
-row       fd_rtol    inv_rtol   nve_rtol
-========  =========  =========  =========
-double    1e-4       1e-10      1e-3
-mixed     5e-3       1e-4       1e-2
-single    2e-2       1e-3       1e-2
-========  =========  =========  =========
+========  =========  =========  =========  ===========
+row       fd_rtol    inv_rtol   nve_rtol   repeat_rtol
+========  =========  =========  =========  ===========
+double    1e-4       1e-10      1e-3       0 (bitwise)
+mixed     5e-3       1e-4       1e-2       1e-3
+single    2e-2       1e-3       1e-2       5e-3
+========  =========  =========  =========  ===========
 
-Any tolerance passed explicitly (``fd_rtol``, ``inv_rtol``, ``nve_rtol``)
-overrides its row entry.
+Any tolerance passed explicitly (``fd_rtol``, ``inv_rtol``, ``nve_rtol``,
+``repeat_rtol``) overrides its row entry. The mixed ``repeat_rtol`` comes
+from the A1 system on CUDA mixed with DeterministicForces (2026-10-04): the
+first evaluation at a position differs from later ones by up to 3e-4 in
+the repeat metric (atom reordering changes the summation order); double
+precision repeats to 7e-10.
 
 Rules shared by both modes
 ==========================
@@ -118,6 +122,26 @@ too large for the check to have power at ``fd_rtol``. Typical causes are a probe
 every probe is stationary (no force signal), or an ``fd_step`` that is too
 small for the precision.
 
+Cutoff crossings
+----------------
+
+A plain (unshifted) cutoff makes the energy jump where a pair crosses r_c
+(OpenMM PME: the erfc direct-space term and LJ without a switching
+function), so a finite difference whose stencil moves a pair across r_c
+measures that jump, not the force. A backend that declares its cutoffs
+through an optional ``energy_cutoffs()`` -> ``{"cutoffs_nm": [...],
+"box_lengths_nm": [Lx, Ly, Lz] or None}`` (orthorhombic, the box
+``energy_forces(x)`` uses without an explicit box) gets every FD coordinate
+skipped whose stencil (+-fd_step) can move some pair across a cutoff:
+``|r - r_c| <= h |d_c| / r + h^2 / (r - h)`` with the minimum-image pair
+vector d (a bound on the change of r for a displacement h along c). Skipped
+coordinates enter neither the error nor the noise floor; their number is
+``PESReport.fd_skipped_cutoff`` and the cutoffs ``fd_cutoffs``. If every
+coordinate is skipped the check has no power (``fd_unresolved``). The guard
+needs ``(n_atoms, 3)`` probes. On the A1 system (2026-10-04) 27 of 186
+coordinates crossed; the others agreed to 2.6e-6 (double) / 3.8e-4 (mixed)
+of the force scale, the crossing ones were off by 28-56 kJ/mol/nm.
+
 Repeatability
 -------------
 
@@ -125,7 +149,8 @@ Each probe is re-evaluated after all the FD and invariance evaluations at
 other positions, so the check can see history-dependent nondeterminism
 (neighbour lists, caches). The re-evaluation is compared against the
 probe's first evaluation.
-- ``repeat_rtol=0.0`` (the default) requires bitwise equality.
+- ``repeat_rtol=0.0`` requires bitwise equality; the default is the
+  precision row's ``repeat_rtol`` (bitwise for double).
 - Otherwise the check requires ``repeat_max_rel_err <= repeat_rtol``, where
   ``repeat_max_rel_err = max(|dE| / (F_s * fd_step), max|dF| / F_s)``. That
   is the relative force error the nondeterminism would inject into the FD
@@ -209,9 +234,9 @@ _FD_TRUNCATION_FACTOR = 1.5
 _N_TOP_FORCE_ATOMS = 4
 
 DEFAULT_TOLERANCES: dict[str, dict[str, float]] = {
-    "double": {"fd_rtol": 1e-4, "inv_rtol": 1e-10, "nve_rtol": 1e-3},
-    "mixed": {"fd_rtol": 5e-3, "inv_rtol": 1e-4, "nve_rtol": 1e-2},
-    "single": {"fd_rtol": 2e-2, "inv_rtol": 1e-3, "nve_rtol": 1e-2},
+    "double": {"fd_rtol": 1e-4, "inv_rtol": 1e-10, "nve_rtol": 1e-3, "repeat_rtol": 0.0},
+    "mixed": {"fd_rtol": 5e-3, "inv_rtol": 1e-4, "nve_rtol": 1e-2, "repeat_rtol": 1e-3},
+    "single": {"fd_rtol": 2e-2, "inv_rtol": 1e-3, "nve_rtol": 1e-2, "repeat_rtol": 5e-3},
 }
 DEFAULT_N_FD_ATOMS = 16
 
@@ -269,6 +294,8 @@ class PESReport:
     fd_atoms: list[list[int]] = dataclasses.field(default_factory=list)
     fd_step: float = float("nan")
     nve_abs_drift_kT: float | None = None
+    fd_skipped_cutoff: int = 0
+    fd_cutoffs: list[float] = dataclasses.field(default_factory=list)
 
 
 def _ratio(num: float, den: float) -> float:
@@ -335,6 +362,36 @@ def _atom_index_array(values, n_atoms: int, name: str) -> np.ndarray:
     if a.size and (a.min() < 0 or a.max() >= n_atoms):
         raise ValueError(f"{name}: atom index out of range [0, {n_atoms})")
     return a
+
+
+def _cutoff_guard(backend: PotentialBackend, shape: tuple[int, ...]):
+    """(cutoffs, box lengths or None) declared by ``backend.energy_cutoffs()``,
+    or ``([], None)`` without the hook (module docstring, "Cutoff crossings")."""
+    hook = getattr(backend, "energy_cutoffs", None)
+    decl = hook() if callable(hook) else None
+    if not decl or not decl.get("cutoffs_nm"):
+        return [], None
+    if len(shape) != 2 or shape[1] != 3:
+        raise ValueError(f"the cutoff-crossing guard needs probes of shape (n_atoms, 3), got {shape}")
+    cutoffs = sorted({float(c) for c in decl["cutoffs_nm"]})
+    if not all(np.isfinite(c) and c > 0 for c in cutoffs):
+        raise ValueError(f"energy_cutoffs(): cutoffs must be finite and > 0, got {cutoffs}")
+    L = decl.get("box_lengths_nm")
+    if L is not None:
+        L = np.asarray(L, dtype=float)
+        if L.shape != (3,) or not np.all(np.isfinite(L) & (L > 0)):
+            raise ValueError(f"energy_cutoffs(): box_lengths_nm must be 3 positive lengths, got {L}")
+    return cutoffs, L
+
+
+def _crosses_cutoff(x: np.ndarray, atom: int, comp: int, h: float, cutoffs, L) -> bool:
+    """Can moving `atom` by up to +-h along `comp` move some pair across a cutoff?"""
+    d = np.delete(x - x[atom], atom, axis=0)
+    if L is not None:
+        d -= np.round(d / L) * L
+    r = np.linalg.norm(d, axis=1)
+    slack = h * np.abs(d[:, comp]) / np.maximum(r, 1e-300) + h * h / np.maximum(r - h, 1e-300)
+    return any(bool(np.any(np.abs(r - rc) <= slack)) for rc in cutoffs)
 
 
 def _fd_component(
@@ -421,7 +478,7 @@ def pes_consistency_suite(
     precision: Literal["double", "mixed", "single"] | None = None,
     check_invariance: bool = False,
     inv_rtol: float | None = None,
-    repeat_rtol: float = 0.0,
+    repeat_rtol: float | None = None,
     nve_steps: int = 0,
     masses: np.ndarray | float | None = None,
     kT: float | None = None,
@@ -450,7 +507,8 @@ def pes_consistency_suite(
     - ``precision``: selects the tolerance row in sampled mode. If omitted,
       it is read from ``backend.effective_config()``.
     - ``repeat_rtol``: ``0.0`` means bitwise repeatability is required;
-      ``> 0`` is a declared tolerance (design §3.5).
+      ``> 0`` is a declared tolerance (design §3.5); ``None`` (default) takes
+      the precision row's value (bitwise for double).
     - ``masses``: required when ``nve_steps > 0``. A scalar, an array of
       x's shape, or ``(n_atoms, 1)``; ``(n_atoms,)`` with 2-D x is a
       ``ValueError``.
@@ -506,7 +564,7 @@ def pes_consistency_suite(
         if int(n_fd_atoms) != n_fd_atoms or n_fd_atoms < 1:
             raise ValueError(f"n_fd_atoms must be an int >= 1, got {n_fd_atoms!r}")
         n_fd_atoms = int(n_fd_atoms)
-    if not repeat_rtol >= 0.0:
+    if repeat_rtol is not None and not repeat_rtol >= 0.0:
         raise ValueError(f"repeat_rtol must be >= 0, got {repeat_rtol!r}")
     if check_invariance and (len(shape) != 2 or shape[1] != 3):
         raise ValueError(
@@ -527,6 +585,7 @@ def pes_consistency_suite(
         ("fd_rtol", fd_rtol),
         ("inv_rtol", inv_rtol),
         ("nve_rtol", nve_rtol),
+        ("repeat_rtol", repeat_rtol),
     ):
         if value is not None:
             if not value >= 0.0:
@@ -557,6 +616,8 @@ def pes_consistency_suite(
             if g.size == 0:
                 raise ValueError(f"fd_atom_groups[{name!r}] is empty")
             groups.append(g)
+    cutoffs, box_L = _cutoff_guard(backend, shape)
+    n_skipped = 0
     fd_atoms_checked: list[list[int]] = []
     excess_max: list[float] = []
     raw_max: list[float] = []
@@ -584,6 +645,9 @@ def pes_consistency_suite(
         noises: list[float] = []
         for a in atoms:
             for idx in _atom_coords(shape, int(a)):
+                if cutoffs and _crosses_cutoff(x, int(a), idx[1], fd_step, cutoffs, box_L):
+                    n_skipped += 1
+                    continue
                 label = f"FD probe {i} coord {idx}"
                 f_h = _fd_component(ev, x, idx, fd_step, label)
                 f_h2 = _fd_component(ev, x, idx, 0.5 * fd_step, label)
@@ -619,6 +683,11 @@ def pes_consistency_suite(
         reasons.append(
             f"fd_atom: fd_max_atom_rel_err={fd_max_atom_rel_err:.3e} > "
             f"fd_rtol={tol['fd_rtol']:.1e}"
+        )
+    if n_fd_coords == 0:
+        reasons.append(
+            f"fd_unresolved: every FD coordinate ({n_skipped}) was skipped because its "
+            "stencil crosses a cutoff; the FD check has no data (use other probes or fd_seed)"
         )
     if not fd_floor_rel <= tol["fd_rtol"]:
         reasons.append(
@@ -672,6 +741,7 @@ def pes_consistency_suite(
         rep_errs.append(_ratio(abs(E2 - E0), force_scale * fd_step))
         rep_errs.append(_ratio(float(np.max(np.abs(F2 - F0))), force_scale))
     repeat_max_rel_err = _nanmax(rep_errs)
+    repeat_rtol = tol["repeat_rtol"]
     if repeat_rtol == 0.0:
         if not repeat_bitwise:
             reasons.append(
@@ -732,6 +802,8 @@ def pes_consistency_suite(
         tolerances=tol,
         kT=kT_used,
         n_dof=n_dof_used,
+        fd_skipped_cutoff=n_skipped,
+        fd_cutoffs=list(cutoffs),
     )
 
 

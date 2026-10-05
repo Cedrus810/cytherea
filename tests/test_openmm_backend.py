@@ -2074,3 +2074,26 @@ def test_m2_net_momentum_threshold_is_pinned():
     with pytest.raises(ValueError, match="momentum"):
         b.build(MDState(x0, _velocities_with_momentum_ratio(m, 2e-3, _key(stage="m2")), 0.0), None, _key())
     b.build(MDState(x0, _velocities_with_momentum_ratio(m, 5e-4, _key(stage="m2")), 0.0), None, _key())
+
+
+# ---------------------------------------------------------------------------
+# A1 14.1 (2026-10-04): the backend declares its pair cutoffs so the PES
+# suite can skip FD coordinates whose stencil crosses one (pes_suite,
+# "Cutoff crossings").
+# ---------------------------------------------------------------------------
+
+
+def test_energy_cutoffs_declares_pair_cutoffs_and_default_box():
+    from cytherea.backends.pes_suite import pes_consistency_suite
+
+    system, top, _ = _ala()
+    assert OpenMMBackend(system, top, _cfg()).energy_cutoffs() is None  # vacuum, NoCutoff
+    wb = testsystems.WaterBox(box_edge=1.2 * u.nanometer, cutoff=0.5 * u.nanometer, constrained=False)
+    b = OpenMMBackend(wb.system, wb.topology, _cfg(constraints="none", rigid_water=False))
+    dec = b.energy_cutoffs()
+    assert dec["cutoffs_nm"] == pytest.approx([0.5])
+    assert dec["box_lengths_nm"] == pytest.approx([1.2, 1.2, 1.2])
+    x0 = np.asarray(wb.positions.value_in_unit(u.nanometer))
+    rep = pes_consistency_suite(b, [x0], mode="sampled", precision="double", n_fd_atoms=60)
+    assert rep.fd_cutoffs == pytest.approx([0.5])
+    assert rep.passed, rep.reasons
